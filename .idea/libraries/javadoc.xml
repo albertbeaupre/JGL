@@ -1,0 +1,55 @@
+<component name="libraryTable">
+  <library name="javadoc">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-egl-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-tinyexr-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-msdfgen-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-hwloc-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-jemalloc-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-shaderc-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-lz4-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-remotery-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-odbc-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-assimp-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-tootle-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-xxhash-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-harfbuzz-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-llvm-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-par-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-vma-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-opengles-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-nfd-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-jawt-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-libdivide-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-fmod-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-opencl-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-tinyfd-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-lmdb-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-opengl-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-openvr-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-ktx-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-yoga-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-cuda-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-openxr-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-rpmalloc-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-vulkan-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-zstd-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-opus-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-stb-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-meow-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-glfw-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-bgfx-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-meshoptimizer-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-nuklear-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-nanovg-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-sse-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-ovr-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-freetype-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-spvc-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lwjgl/javadoc/lwjgl-openal-javadoc.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -1,20 +1,9 @@
 package jgl;
 
-import jgl.enums.SwapInterval;
-import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
-import org.lwjgl.glfw.GLFWVidMode;
-import org.lwjgl.glfw.GLFWWindowCloseCallback;
-import org.lwjgl.glfw.GLFWWindowContentScaleCallback;
-import org.lwjgl.glfw.GLFWWindowFocusCallback;
-import org.lwjgl.glfw.GLFWWindowIconifyCallback;
-import org.lwjgl.glfw.GLFWWindowMaximizeCallback;
-import org.lwjgl.glfw.GLFWWindowPosCallback;
-import org.lwjgl.glfw.GLFWWindowSizeCallback;
-import org.lwjgl.opengl.GL;
-import org.lwjgl.system.MemoryStack;
-
 import java.nio.IntBuffer;
-
+import jgl.enums.SwapInterval;
+import jgl.event.events.WindowResizeEvent;
+import jgl.event.listeners.WindowResizeListener;
 import static org.lwjgl.glfw.GLFW.GLFW_DOUBLEBUFFER;
 import static org.lwjgl.glfw.GLFW.GLFW_FALSE;
 import static org.lwjgl.glfw.GLFW.GLFW_RESIZABLE;
@@ -26,8 +15,6 @@ import static org.lwjgl.glfw.GLFW.glfwDestroyWindow;
 import static org.lwjgl.glfw.GLFW.glfwGetFramebufferSize;
 import static org.lwjgl.glfw.GLFW.glfwGetPrimaryMonitor;
 import static org.lwjgl.glfw.GLFW.glfwGetVideoMode;
-import static org.lwjgl.glfw.GLFW.glfwGetWindowPos;
-import static org.lwjgl.glfw.GLFW.glfwGetWindowSize;
 import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
 import static org.lwjgl.glfw.GLFW.glfwSetFramebufferSizeCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowCloseCallback;
@@ -46,7 +33,18 @@ import static org.lwjgl.glfw.GLFW.glfwShowWindow;
 import static org.lwjgl.glfw.GLFW.glfwSwapInterval;
 import static org.lwjgl.glfw.GLFW.glfwWindowHint;
 import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
+import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
+import org.lwjgl.glfw.GLFWVidMode;
+import org.lwjgl.glfw.GLFWWindowCloseCallback;
+import org.lwjgl.glfw.GLFWWindowContentScaleCallback;
+import org.lwjgl.glfw.GLFWWindowFocusCallback;
+import org.lwjgl.glfw.GLFWWindowIconifyCallback;
+import org.lwjgl.glfw.GLFWWindowMaximizeCallback;
+import org.lwjgl.glfw.GLFWWindowPosCallback;
+import org.lwjgl.glfw.GLFWWindowSizeCallback;
+import org.lwjgl.opengl.GL;
 import static org.lwjgl.opengl.GL11.glViewport;
+import org.lwjgl.system.MemoryStack;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public final class Window {
@@ -62,6 +60,8 @@ public final class Window {
 
     private static long address;
     private static SwapInterval swapInterval = SwapInterval.OFF;
+    private static short x, y;
+    private static short width, height;
 
     public static void init(String title, int width, int height) {
         glfwDefaultWindowHints();
@@ -82,9 +82,16 @@ public final class Window {
 
         });
         sizeCallback = glfwSetWindowSizeCallback(address, (win, newW, newH) -> {
+            short oldWidth = Window.width;
+            short oldHeight = Window.height;
+            Window.width = (short) newW;
+            Window.height = (short) newH;
 
+            JGL.publish(new WindowResizeEvent(oldWidth, oldHeight, Window.width, Window.height));
         });
         posCallback = glfwSetWindowPosCallback(address, (win, newX, newY) -> {
+            Window.x = (short) newX;
+            Window.y = (short) newY;
         });
         focusCallback = glfwSetWindowFocusCallback(address, (win, focused) -> {
 
@@ -108,6 +115,12 @@ public final class Window {
         glViewport(0, 0, width, height);
     }
 
+    public static void addWindowResizeListener(WindowResizeListener listener) {
+        if (listener == null)
+            throw new NullPointerException("A null WindowResizeListener cannot be added to the Window");
+        JGL.registerEventListener(WindowResizeEvent.class, listener);
+    }
+
     static boolean shouldClose() {
         return glfwWindowShouldClose(address);
     }
@@ -123,13 +136,11 @@ public final class Window {
         if (vid == null)
             throw new RuntimeException("Failed to get video mode");
 
-        int[] size = getWindowSize();
-        int[] pos = getWindowPos();
 
         if (fullscreen) {
             glfwSetWindowMonitor(address, glfwGetPrimaryMonitor(), 0, 0, vid.width(), vid.height(), vid.refreshRate());
         } else {
-            glfwSetWindowMonitor(address, NULL, pos[0], pos[1], size[0], size[1], vid.refreshRate());
+            glfwSetWindowMonitor(address, NULL, getX(), getY(), getWidth(), getHeight(), vid.refreshRate());
         }
     }
 
@@ -137,13 +148,20 @@ public final class Window {
         glfwSetWindowSize(address, width, height);
     }
 
-    public static int[] getWindowSize() {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            IntBuffer w = stack.mallocInt(1);
-            IntBuffer h = stack.mallocInt(1);
-            glfwGetWindowSize(address, w, h);
-            return new int[]{w.get(0), h.get(0)};
-        }
+    public static int getWidth() {
+        return width;
+    }
+
+    public static int getHeight() {
+        return height;
+    }
+
+    public static int getX() {
+        return x;
+    }
+
+    public static int getY() {
+        return y;
     }
 
     public static int[] getFramebufferSize() {
@@ -152,15 +170,6 @@ public final class Window {
             IntBuffer h = stack.mallocInt(1);
             glfwGetFramebufferSize(address, w, h);
             return new int[]{w.get(0), h.get(0)};
-        }
-    }
-
-    public static int[] getWindowPos() {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            IntBuffer x = stack.mallocInt(1);
-            IntBuffer y = stack.mallocInt(1);
-            glfwGetWindowPos(address, x, y);
-            return new int[]{x.get(0), y.get(0)};
         }
     }
 

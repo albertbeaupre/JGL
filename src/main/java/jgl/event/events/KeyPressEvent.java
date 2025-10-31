@@ -1,4 +1,4 @@
-package jgl.event.impl;
+package jgl.event.events;
 
 public class KeyPressEvent extends KeyEvent {
 

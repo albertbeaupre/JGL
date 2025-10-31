@@ -1,4 +1,4 @@
-package jgl.event.impl;
+package jgl.event.events;
 
 import jgl.event.Event;
 
@@ -7,18 +7,29 @@ import static org.lwjgl.glfw.GLFW.GLFW_MOD_CONTROL;
 import static org.lwjgl.glfw.GLFW.GLFW_MOD_SHIFT;
 import static org.lwjgl.glfw.GLFW.GLFW_MOD_SUPER;
 
-public class KeyEvent extends Event {
+public class MouseEvent extends Event {
 
-    private final short key;
+    private final short x, y;
+    private final byte button;
     private final byte modifiers;
 
-    public KeyEvent(int key, int modifiers) {
-        this.key = (short) key;
+    public MouseEvent(int x, int y, int button, int modifiers) {
+        this.x = (short) x;
+        this.y = (short) y;
+        this.button = (byte) button;
         this.modifiers = (byte) modifiers;
     }
 
-    public short getKey() {
-        return key;
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public int getButton() {
+        return button;
     }
 
     public boolean isShiftDown() {

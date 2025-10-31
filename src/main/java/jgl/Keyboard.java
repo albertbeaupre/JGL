@@ -1,7 +1,7 @@
 package jgl;
 
-import jgl.event.impl.KeyPressEvent;
-import jgl.event.impl.KeyReleaseEvent;
+import jgl.event.events.KeyPressEvent;
+import jgl.event.events.KeyReleaseEvent;
 import org.lwjgl.glfw.GLFWKeyCallback;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_LAST;
@@ -52,7 +52,11 @@ public final class Keyboard {
                 return;
 
             switch (action) {
-                case GLFW_PRESS, GLFW_REPEAT -> JGL.publish(new KeyPressEvent(key, mods));
+                case GLFW_PRESS, GLFW_REPEAT -> {
+
+
+                    JGL.publish(new KeyPressEvent(key, mods));
+                }
                 case GLFW_RELEASE -> JGL.publish(new KeyReleaseEvent(key, mods));
             }
         });

@@ -1,107 +1,131 @@
 package jgl;
 
-import static org.lwjgl.opengl.GL33.*;
+import jgl.geometry.ShapeRenderer;
+import static org.lwjgl.opengl.GL33.GL_BLEND;
+import static org.lwjgl.opengl.GL33.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL33.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL33.GL_SRC_ALPHA;
+import static org.lwjgl.opengl.GL33.glBlendFunc;
+import static org.lwjgl.opengl.GL33.glClear;
+import static org.lwjgl.opengl.GL33.glClearColor;
+import static org.lwjgl.opengl.GL33.glEnable;
 
 /**
- * Demonstrates viewport clipping with a yellow minimap and a circle
- * drawn in its bottom-right corner that tries to bleed outside,
- * but is cleanly clipped by glScissor().
+ * Comprehensive ShapeRenderer test.
  *
- * @author Albert Beaupre
- * @since 2025-10-30
+ * Tests:
+ *  - fillRect, drawRect
+ *  - fillCircle, drawCircle
+ *  - fillPolygonConvex, drawPolygon
+ *  - fillRoundedRect, drawRoundedRect
+ *  - addBorder(thickness)
+ *  - AA toggling
  */
 public class Launcher implements Application {
 
-    private int vaoRect;
-    private int vboRect;
-    private int vaoCircle;
-    private int vboCircle;
-
-    public static void main(String[] args) {
-        JGL.init(new Launcher(), "Viewport Clipping Circle Demo", 800, 600);
-    }
+    private static final int WIDTH = 1000;
+    private static final int HEIGHT = 700;
+    private ShapeRenderer renderer;
+    private boolean aaEnabled = true;
 
     @Override
     public void init() {
-        glClearColor(0f, 0f, 0f, 1f); // background color
+        glClearColor(0.1f, 0.1f, 0.1f, 1f);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        // === Rectangle geometry (for minimap fill test) ===
-        float[] rectVertices = {
-                -1.2f, -1.2f,
-                1.2f, -1.2f,
-                1.2f,  1.2f,
-                -1.2f,  1.2f
-        };
-
-        vaoRect = glGenVertexArrays();
-        glBindVertexArray(vaoRect);
-
-        vboRect = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, vboRect);
-        glBufferData(GL_ARRAY_BUFFER, rectVertices, GL_STATIC_DRAW);
-        glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, 0);
-        glEnableVertexAttribArray(0);
-
-        // === Circle geometry ===
-        int segments = 64;
-        float radius = 1.2f; // intentionally large to bleed outside
-        float[] circleVertices = new float[(segments + 2) * 2];
-        circleVertices[0] = 0f;
-        circleVertices[1] = 0f;
-        for (int i = 0; i <= segments; i++) {
-            double angle = 2.0 * Math.PI * i / segments;
-            circleVertices[(i + 1) * 2] = (float) Math.cos(angle) * radius;
-            circleVertices[(i + 1) * 2 + 1] = (float) Math.sin(angle) * radius;
-        }
-
-        vaoCircle = glGenVertexArrays();
-        glBindVertexArray(vaoCircle);
-
-        vboCircle = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, vboCircle);
-        glBufferData(GL_ARRAY_BUFFER, circleVertices, GL_STATIC_DRAW);
-        glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, 0);
-        glEnableVertexAttribArray(0);
+        renderer = new ShapeRenderer();
     }
 
     @Override
     public void render() {
         glClear(GL_COLOR_BUFFER_BIT);
-        int windowWidth = 800;
-        int windowHeight = 600;
 
-        // === FULL WINDOW BACKGROUND ===
-        glViewport(0, 0, windowWidth, windowHeight);
-        glDisable(GL_SCISSOR_TEST);
-        glClearColor(0.1f, 0.1f, 0.1f, 1f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        renderer.begin();
 
-        // === MINIMAP REGION ===
-        int mapWidth = 200;
-        int mapHeight = 200;
-        int mapX = windowWidth - mapWidth - 20;
-        int mapY = 20;
+        // === Fill tests ===
+        renderer.setAntialias(true);
+        renderer.setFeather(1.5f);
 
-        glViewport(mapX, mapY, mapWidth, mapHeight);
-        glEnable(GL_SCISSOR_TEST);
-        glScissor(mapX, mapY, mapWidth, mapHeight);
+        float x = 80, y = 500, gapX = 180, gapY = 160;
 
-        // Fill minimap yellow
-        glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        // 1. Filled rectangle + border
+        renderer.setColor(1f, 0.2f, 0.2f);
+        renderer.fillRect(x, y, 120, 80);
+        renderer.setColor(1f, 1f, 1f);
+        renderer.addBorder(3f);
 
-        // Draw a blue circle that tries to bleed out (bottom-right)
-        glBindVertexArray(vaoCircle);
-        glPushMatrix();
-        glTranslatef(0.8f, -0.8f, 0f); // move to bottom-right corner (in minimap coords)
-        glColor3f(0.0f, 0.3f, 1.0f);
-        glDrawArrays(GL_TRIANGLE_FAN, 0, 66); // draw the circle
-        glPopMatrix();
+        // 2. Filled circle + border
+        renderer.setColor(0.2f, 0.5f, 1f);
+        renderer.fillCircle(x + gapX, y + 40, 40, 48);
+        renderer.setColor(1f, 1f, 1f);
+        renderer.addBorder(3f);
 
-        glDisable(GL_SCISSOR_TEST);
+        // 3. Filled triangle + border
+        renderer.setColor(0.3f, 1f, 0.4f);
+        float[] tri = {x + 2 * gapX + 60, y, x + 2 * gapX + 120, y, x + 2 * gapX + 90, y + 90};
+        renderer.fillPolygonConvex(tri);
+        renderer.setColor(1f, 1f, 1f);
+        renderer.addBorder(2.5f);
 
-        // Restore full window viewport
-        glViewport(0, 0, windowWidth, windowHeight);
+        // 4. Filled rounded rectangle + border
+        renderer.setColor(1f, 0.6f, 0.15f);
+        renderer.fillRoundedRect(x + 3 * gapX, y, 160, 90, 20, 20);
+        renderer.setColor(1f, 1f, 1f);
+        renderer.addBorder(3.5f);
+
+        // === Outline tests ===
+        float oy = y - gapY;
+
+        renderer.setColor(1f, 0.4f, 0.4f);
+        renderer.drawRect(x, oy, 120, 80, 3f);
+
+        renderer.setColor(0.3f, 0.7f, 1f);
+        renderer.drawCircle(x + gapX, oy + 40, 40, 3f, 48);
+
+        renderer.setColor(1f, 1f, 0.4f);
+        float[] tri2 = {x + 2 * gapX + 60, oy, x + 2 * gapX + 120, oy, x + 2 * gapX + 90, oy + 90};
+        renderer.drawPolygon(tri2, 2.5f);
+
+        renderer.setColor(1f, 0.8f, 0.3f);
+        renderer.drawRoundedRect(x + 3 * gapX, oy, 160, 90, 20, 3f, 20);
+
+        // === Line and polygon tests ===
+        float lx = 100, ly = 250;
+        renderer.setColor(1f, 1f, 0.2f);
+        renderer.drawLine(lx, ly, lx + 140, ly + 60, 3f);
+        renderer.setColor(0.3f, 1f, 1f);
+        renderer.drawLine(lx, ly + 60, lx + 140, ly, 3f);
+
+        // Hexagon fill + border test
+        float[] hex = new float[12];
+        float hx = 400, hy = 230, r = 50;
+        for (int i = 0; i < 6; i++) {
+            double t = Math.toRadians(i * 60);
+            hex[2 * i] = (float) (hx + r * Math.cos(t));
+            hex[2 * i + 1] = (float) (hy + r * Math.sin(t));
+        }
+        renderer.setColor(0.4f, 0.6f, 1f);
+        renderer.fillPolygonConvex(hex);
+        renderer.setColor(1f, 1f, 1f);
+        renderer.addBorder(3f);
+
+        // Rounded rectangle long test
+        renderer.setColor(1f, 0.8f, 0.2f);
+        renderer.fillRoundedRect(600, 230, 220, 90, 40, 24);
+        renderer.setColor(0f, 0f, 0f);
+        renderer.addBorder(2f);
+
+        // === AA toggle display ===
+        renderer.setColor(aaEnabled ? 0.2f : 0.6f, aaEnabled ? 1f : 0.2f, 0.3f);
+        renderer.fillRect(50, 80, 100, 40);
+        renderer.setColor(1f, 1f, 1f);
+        renderer.addBorder(20f);
+
+        renderer.end();
+
+        Window.setTitle(String.format("ShapeRenderer Visual Test | FPS: %.0f | AA: %s",
+                JGL.getFramesPerSecond(), aaEnabled ? "ON" : "OFF"));
     }
 
     @Override
@@ -110,9 +134,10 @@ public class Launcher implements Application {
 
     @Override
     public void dispose() {
-        glDeleteBuffers(vboRect);
-        glDeleteVertexArrays(vaoRect);
-        glDeleteBuffers(vboCircle);
-        glDeleteVertexArrays(vaoCircle);
+        renderer.dispose();
+    }
+
+    public static void main(String[] args) {
+        JGL.init(new Launcher(), "ShapeRenderer Visual Test", WIDTH, HEIGHT);
     }
 }

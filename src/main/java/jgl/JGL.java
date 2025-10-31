@@ -3,7 +3,6 @@ package jgl;
 import jgl.event.Event;
 import jgl.event.EventListener;
 import jgl.event.EventPublisher;
-
 import static org.lwjgl.glfw.GLFW.glfwGetTime;
 import static org.lwjgl.glfw.GLFW.glfwInit;
 import static org.lwjgl.glfw.GLFW.glfwPollEvents;
@@ -16,6 +15,7 @@ import static org.lwjgl.glfw.GLFW.glfwTerminate;
  * rate and time, and release resources.
  */
 public class JGL {
+
 
     private static final EventPublisher events = new EventPublisher();
     private static double deltaTime;
@@ -43,6 +43,7 @@ public class JGL {
 
         double lastTime = glfwGetTime();
         double fpsTime = 0;
+        short frames = 0;
 
         application.init();
         while (!Window.shouldClose()) {
@@ -51,18 +52,20 @@ public class JGL {
             lastTime = now;
 
             glfwPollEvents();
-            glfwSwapBuffers(Window.getAddress());
 
             application.update(deltaTime);
             application.render();
 
             fpsTime += deltaTime;
-            framesPerSecond++;
+            frames++;
 
             if (fpsTime >= 1) {
+                framesPerSecond = frames;
+
                 fpsTime = 0;
-                framesPerSecond = 0;
+                frames = 0;
             }
+            glfwSwapBuffers(Window.getAddress());
         }
         application.dispose();
         dispose();

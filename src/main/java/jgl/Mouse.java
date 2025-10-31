@@ -1,9 +1,9 @@
 package jgl;
 
-import jgl.event.impl.MouseMoveEvent;
-import jgl.event.impl.MousePressEvent;
-import jgl.event.impl.MouseReleaseEvent;
-import jgl.event.impl.MouseScrollEvent;
+import jgl.event.events.MouseMoveEvent;
+import jgl.event.events.MousePressEvent;
+import jgl.event.events.MouseReleaseEvent;
+import jgl.event.events.MouseScrollEvent;
 import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWMouseButtonCallback;
 import org.lwjgl.glfw.GLFWScrollCallback;

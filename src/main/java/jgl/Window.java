@@ -1,26 +1,56 @@
 package jgl;
 
-import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11.glViewport;
-import static org.lwjgl.system.MemoryUtil.NULL;
-
-import org.lwjgl.glfw.*;
+import jgl.enums.SwapInterval;
+import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
+import org.lwjgl.glfw.GLFWVidMode;
+import org.lwjgl.glfw.GLFWWindowCloseCallback;
+import org.lwjgl.glfw.GLFWWindowContentScaleCallback;
+import org.lwjgl.glfw.GLFWWindowFocusCallback;
+import org.lwjgl.glfw.GLFWWindowIconifyCallback;
+import org.lwjgl.glfw.GLFWWindowMaximizeCallback;
+import org.lwjgl.glfw.GLFWWindowPosCallback;
+import org.lwjgl.glfw.GLFWWindowSizeCallback;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryStack;
 
 import java.nio.IntBuffer;
 
+import static org.lwjgl.glfw.GLFW.GLFW_DOUBLEBUFFER;
+import static org.lwjgl.glfw.GLFW.GLFW_FALSE;
+import static org.lwjgl.glfw.GLFW.GLFW_RESIZABLE;
+import static org.lwjgl.glfw.GLFW.GLFW_TRUE;
+import static org.lwjgl.glfw.GLFW.GLFW_VISIBLE;
+import static org.lwjgl.glfw.GLFW.glfwCreateWindow;
+import static org.lwjgl.glfw.GLFW.glfwDefaultWindowHints;
+import static org.lwjgl.glfw.GLFW.glfwDestroyWindow;
+import static org.lwjgl.glfw.GLFW.glfwGetFramebufferSize;
+import static org.lwjgl.glfw.GLFW.glfwGetPrimaryMonitor;
+import static org.lwjgl.glfw.GLFW.glfwGetVideoMode;
+import static org.lwjgl.glfw.GLFW.glfwGetWindowPos;
+import static org.lwjgl.glfw.GLFW.glfwGetWindowSize;
+import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
+import static org.lwjgl.glfw.GLFW.glfwSetFramebufferSizeCallback;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowCloseCallback;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowContentScaleCallback;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowFocusCallback;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowIconifyCallback;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowMaximizeCallback;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowMonitor;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowPos;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowPosCallback;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowShouldClose;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowSize;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowSizeCallback;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowTitle;
+import static org.lwjgl.glfw.GLFW.glfwShowWindow;
+import static org.lwjgl.glfw.GLFW.glfwSwapInterval;
+import static org.lwjgl.glfw.GLFW.glfwWindowHint;
+import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
+import static org.lwjgl.opengl.GL11.glViewport;
+import static org.lwjgl.system.MemoryUtil.NULL;
+
 public final class Window {
 
-    private static final int STATE_RESIZED = 1 << 0;
-    private static final int STATE_FOCUSED = 1 << 1;
-    private static final int STATE_ICONIFIED = 1 << 2;
-    private static final int STATE_MAXIMIZED = 1 << 3;
-    private static final int STATE_VISIBLE = 1 << 4;
-    private static final int STATE_CLOSE_REQ = 1 << 5;
-    private static final int STATE_SCALE_CHANGED = 1 << 6;
-
-    private static GLFWErrorCallback errorCallback;
     private static GLFWFramebufferSizeCallback fbCallback;
     private static GLFWWindowFocusCallback focusCallback;
     private static GLFWWindowIconifyCallback iconifyCallback;
@@ -32,7 +62,6 @@ public final class Window {
 
     private static long address;
     private static SwapInterval swapInterval = SwapInterval.OFF;
-    private static byte state;
 
     public static void init(String title, int width, int height) {
         glfwDefaultWindowHints();
@@ -40,23 +69,33 @@ public final class Window {
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
         glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
 
-
         address = glfwCreateWindow(width, height, title, NULL, NULL);
 
-        if (address == NULL) throw new RuntimeException("Failed to create the GLFW window");
+        if (address == NULL)
+            throw new RuntimeException("Failed to create the GLFW window");
 
         glfwMakeContextCurrent(address);
         glfwSwapInterval(swapInterval.getInterval());
         GL.createCapabilities();
 
-        fbCallback = glfwSetFramebufferSizeCallback(address, (win, newW, newH) -> state |= STATE_RESIZED);
-        sizeCallback = glfwSetWindowSizeCallback(address, (win, newW, newH) -> state |= STATE_RESIZED);
-        posCallback = glfwSetWindowPosCallback(address, (win, newX, newY) -> {});
-        focusCallback = glfwSetWindowFocusCallback(address, (win, focused) -> state = focused ? (byte) (state | STATE_FOCUSED) : (byte) (state & ~STATE_FOCUSED));
-        iconifyCallback = glfwSetWindowIconifyCallback(address, (win, iconified) -> state = iconified ? (byte) (state | STATE_ICONIFIED) : (byte) (state & ~STATE_ICONIFIED));
-        maximizeCallback = glfwSetWindowMaximizeCallback(address, (win, maximized) -> state = maximized ? (byte) (state | STATE_MAXIMIZED) : (byte) (state & ~STATE_MAXIMIZED));
-        scaleCallback = glfwSetWindowContentScaleCallback(address, (win, xs, ys) -> state |= STATE_SCALE_CHANGED);
-        closeCallback = glfwSetWindowCloseCallback(address, (win) -> state |= STATE_CLOSE_REQ);
+        fbCallback = glfwSetFramebufferSizeCallback(address, (win, newW, newH) -> {
+
+        });
+        sizeCallback = glfwSetWindowSizeCallback(address, (win, newW, newH) -> {
+
+        });
+        posCallback = glfwSetWindowPosCallback(address, (win, newX, newY) -> {
+        });
+        focusCallback = glfwSetWindowFocusCallback(address, (win, focused) -> {
+
+        });
+        iconifyCallback = glfwSetWindowIconifyCallback(address, (win, iconified) -> {
+        });
+        maximizeCallback = glfwSetWindowMaximizeCallback(address, (win, maximized) -> {
+        });
+        scaleCallback = glfwSetWindowContentScaleCallback(address, (win, xs, ys) -> {
+        });
+        closeCallback = glfwSetWindowCloseCallback(address, (win) -> glfwSetWindowShouldClose(win, true));
 
         GLFWVidMode vid = glfwGetVideoMode(glfwGetPrimaryMonitor());
         if (vid != null) {
@@ -66,23 +105,11 @@ public final class Window {
         }
 
         glfwShowWindow(address);
-        state |= STATE_VISIBLE;
-
         glViewport(0, 0, width, height);
     }
 
-    static void update() {
-        if ((state & STATE_RESIZED) != 0) {
-            int[] size = getFramebufferSize();
-            glViewport(0, 0, size[0], size[1]);
-            state &= ~STATE_RESIZED;
-        }
-
-        if ((state & STATE_CLOSE_REQ) != 0) glfwSetWindowShouldClose(address, true);
-    }
-
     static boolean shouldClose() {
-        return (state & STATE_CLOSE_REQ) != 0;
+        return glfwWindowShouldClose(address);
     }
 
     public static void setTitle(String newTitle) {
@@ -93,7 +120,8 @@ public final class Window {
         if (address == NULL) return;
 
         GLFWVidMode vid = glfwGetVideoMode(glfwGetPrimaryMonitor());
-        if (vid == null) throw new RuntimeException("Failed to get video mode");
+        if (vid == null)
+            throw new RuntimeException("Failed to get video mode");
 
         int[] size = getWindowSize();
         int[] pos = getWindowPos();
@@ -115,8 +143,6 @@ public final class Window {
             IntBuffer h = stack.mallocInt(1);
             glfwGetWindowSize(address, w, h);
             return new int[]{w.get(0), h.get(0)};
-        } catch (Exception e) {
-            return null;
         }
     }
 
@@ -149,6 +175,14 @@ public final class Window {
     }
 
     protected static void dispose() {
+        if (fbCallback != null) fbCallback.free();
+        if (sizeCallback != null) sizeCallback.free();
+        if (posCallback != null) posCallback.free();
+        if (focusCallback != null) focusCallback.free();
+        if (iconifyCallback != null) iconifyCallback.free();
+        if (maximizeCallback != null) maximizeCallback.free();
+        if (scaleCallback != null) scaleCallback.free();
+        if (closeCallback != null) closeCallback.free();
         if (address != NULL) glfwDestroyWindow(address);
     }
 

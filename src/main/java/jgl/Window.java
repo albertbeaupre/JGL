@@ -1,54 +1,30 @@
 package jgl;
 
-import java.nio.IntBuffer;
 import jgl.enums.SwapInterval;
 import jgl.event.events.WindowResizeEvent;
 import jgl.event.listeners.WindowResizeListener;
-import static org.lwjgl.glfw.GLFW.GLFW_DOUBLEBUFFER;
-import static org.lwjgl.glfw.GLFW.GLFW_FALSE;
-import static org.lwjgl.glfw.GLFW.GLFW_RESIZABLE;
-import static org.lwjgl.glfw.GLFW.GLFW_TRUE;
-import static org.lwjgl.glfw.GLFW.GLFW_VISIBLE;
-import static org.lwjgl.glfw.GLFW.glfwCreateWindow;
-import static org.lwjgl.glfw.GLFW.glfwDefaultWindowHints;
-import static org.lwjgl.glfw.GLFW.glfwDestroyWindow;
-import static org.lwjgl.glfw.GLFW.glfwGetFramebufferSize;
-import static org.lwjgl.glfw.GLFW.glfwGetPrimaryMonitor;
-import static org.lwjgl.glfw.GLFW.glfwGetVideoMode;
-import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
-import static org.lwjgl.glfw.GLFW.glfwSetFramebufferSizeCallback;
-import static org.lwjgl.glfw.GLFW.glfwSetWindowCloseCallback;
-import static org.lwjgl.glfw.GLFW.glfwSetWindowContentScaleCallback;
-import static org.lwjgl.glfw.GLFW.glfwSetWindowFocusCallback;
-import static org.lwjgl.glfw.GLFW.glfwSetWindowIconifyCallback;
-import static org.lwjgl.glfw.GLFW.glfwSetWindowMaximizeCallback;
-import static org.lwjgl.glfw.GLFW.glfwSetWindowMonitor;
-import static org.lwjgl.glfw.GLFW.glfwSetWindowPos;
-import static org.lwjgl.glfw.GLFW.glfwSetWindowPosCallback;
-import static org.lwjgl.glfw.GLFW.glfwSetWindowShouldClose;
-import static org.lwjgl.glfw.GLFW.glfwSetWindowSize;
-import static org.lwjgl.glfw.GLFW.glfwSetWindowSizeCallback;
-import static org.lwjgl.glfw.GLFW.glfwSetWindowTitle;
-import static org.lwjgl.glfw.GLFW.glfwShowWindow;
-import static org.lwjgl.glfw.GLFW.glfwSwapInterval;
-import static org.lwjgl.glfw.GLFW.glfwWindowHint;
-import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
-import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
-import org.lwjgl.glfw.GLFWVidMode;
-import org.lwjgl.glfw.GLFWWindowCloseCallback;
-import org.lwjgl.glfw.GLFWWindowContentScaleCallback;
-import org.lwjgl.glfw.GLFWWindowFocusCallback;
-import org.lwjgl.glfw.GLFWWindowIconifyCallback;
-import org.lwjgl.glfw.GLFWWindowMaximizeCallback;
-import org.lwjgl.glfw.GLFWWindowPosCallback;
-import org.lwjgl.glfw.GLFWWindowSizeCallback;
+import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GL;
-import static org.lwjgl.opengl.GL11.glViewport;
 import org.lwjgl.system.MemoryStack;
+
+import java.nio.IntBuffer;
+
+import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
+/**
+ * The Window class serves as a utility for managing an OpenGL-based window
+ * using GLFW. It provides methods for initializing, configuring, and disposing
+ * of the window, as well as handling window events and states such as resizing,
+ * full-screen toggling, and setting various properties.
+ *
+ * @author Albert Beaupre
+ * @since October 17th, 2025
+ */
 public final class Window {
 
+    // GLFW callback handlers
     private static GLFWFramebufferSizeCallback fbCallback;
     private static GLFWWindowFocusCallback focusCallback;
     private static GLFWWindowIconifyCallback iconifyCallback;
@@ -58,13 +34,25 @@ public final class Window {
     private static GLFWWindowSizeCallback sizeCallback;
     private static GLFWWindowContentScaleCallback scaleCallback;
 
-    private static long address;
+    // Window properties
     private static SwapInterval swapInterval = SwapInterval.OFF;
+    private static long address;
     private static short x, y;
     private static short width, height;
 
+    /**
+     * Initializes the GLFW window with the specified parameters.
+     *
+     * @param title  Window title
+     * @param width  Initial window width
+     * @param height Initial window height
+     */
     public static void init(String title, int width, int height) {
+        Window.width = (short) width;
+        Window.height = (short) height;
+
         glfwDefaultWindowHints();
+        glfwWindowHint(GLFW_SAMPLES, 4);
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
         glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
@@ -78,8 +66,8 @@ public final class Window {
         glfwSwapInterval(swapInterval.getInterval());
         GL.createCapabilities();
 
+        // Set up all window callbacks
         fbCallback = glfwSetFramebufferSizeCallback(address, (win, newW, newH) -> {
-
         });
         sizeCallback = glfwSetWindowSizeCallback(address, (win, newW, newH) -> {
             short oldWidth = Window.width;
@@ -94,7 +82,6 @@ public final class Window {
             Window.y = (short) newY;
         });
         focusCallback = glfwSetWindowFocusCallback(address, (win, focused) -> {
-
         });
         iconifyCallback = glfwSetWindowIconifyCallback(address, (win, iconified) -> {
         });
@@ -104,6 +91,7 @@ public final class Window {
         });
         closeCallback = glfwSetWindowCloseCallback(address, (win) -> glfwSetWindowShouldClose(win, true));
 
+        // Center window on screen
         GLFWVidMode vid = glfwGetVideoMode(glfwGetPrimaryMonitor());
         if (vid != null) {
             int centerX = (vid.width() - width) / 2;
@@ -115,27 +103,45 @@ public final class Window {
         glViewport(0, 0, width, height);
     }
 
+    /**
+     * Adds a window resize event listener.
+     *
+     * @param listener The listener to add
+     * @throws NullPointerException if listener is null
+     */
     public static void addWindowResizeListener(WindowResizeListener listener) {
         if (listener == null)
             throw new NullPointerException("A null WindowResizeListener cannot be added to the Window");
         JGL.registerEventListener(WindowResizeEvent.class, listener);
     }
 
+    /**
+     * @return true if window should close, false otherwise
+     */
     static boolean shouldClose() {
         return glfwWindowShouldClose(address);
     }
 
+    /**
+     * Sets the window title.
+     *
+     * @param newTitle The new window title
+     */
     public static void setTitle(String newTitle) {
         glfwSetWindowTitle(address, newTitle);
     }
 
+    /**
+     * Sets the window fullscreen state.
+     *
+     * @param fullscreen true for fullscreen, false for windowed
+     */
     public static void setFullscreen(boolean fullscreen) {
         if (address == NULL) return;
 
         GLFWVidMode vid = glfwGetVideoMode(glfwGetPrimaryMonitor());
         if (vid == null)
             throw new RuntimeException("Failed to get video mode");
-
 
         if (fullscreen) {
             glfwSetWindowMonitor(address, glfwGetPrimaryMonitor(), 0, 0, vid.width(), vid.height(), vid.refreshRate());
@@ -144,26 +150,49 @@ public final class Window {
         }
     }
 
+    /**
+     * Sets the window size.
+     *
+     * @param width  New window width
+     * @param height New window height
+     */
     public static void setSize(int width, int height) {
         glfwSetWindowSize(address, width, height);
     }
 
+    /**
+     * @return Window width
+     */
     public static int getWidth() {
         return width;
     }
 
+    /**
+     * @return Window height
+     */
     public static int getHeight() {
         return height;
     }
 
+    /**
+     * @return Window X coordinate
+     */
     public static int getX() {
         return x;
     }
 
+    /**
+     * @return Window Y coordinate
+     */
     public static int getY() {
         return y;
     }
 
+    /**
+     * Gets the framebuffer size.
+     *
+     * @return Array containing framebuffer width and height
+     */
     public static int[] getFramebufferSize() {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             IntBuffer w = stack.mallocInt(1);
@@ -173,17 +202,28 @@ public final class Window {
         }
     }
 
+    /**
+     * Sets the swap interval (VSync).
+     *
+     * @param type The swap interval type
+     */
     public static void setSwapInterval(SwapInterval type) {
         if (type == null) return;
         swapInterval = type;
         glfwSwapInterval(type.getInterval());
     }
 
+    /**
+     * @return Current SwapInterval
+     */
     public static SwapInterval getSwapInterval() {
         return swapInterval;
     }
 
-    protected static void dispose() {
+    /**
+     * Disposes of window resources.
+     */
+    static void dispose() {
         if (fbCallback != null) fbCallback.free();
         if (sizeCallback != null) sizeCallback.free();
         if (posCallback != null) posCallback.free();
@@ -195,6 +235,9 @@ public final class Window {
         if (address != NULL) glfwDestroyWindow(address);
     }
 
+    /**
+     * @return GLFW window handle
+     */
     public static long getAddress() {
         return address;
     }

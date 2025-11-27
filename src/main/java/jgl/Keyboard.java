@@ -4,78 +4,166 @@ import jgl.event.events.KeyPressEvent;
 import jgl.event.events.KeyReleaseEvent;
 import org.lwjgl.glfw.GLFWKeyCallback;
 
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_LAST;
-import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
-import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
-import static org.lwjgl.glfw.GLFW.GLFW_REPEAT;
-import static org.lwjgl.glfw.GLFW.glfwSetKeyCallback;
+import static org.lwjgl.glfw.GLFW.*;
 
 /**
- * The Keyboard class is a utility for handling keyboard input events in an application.
- * It manages the state of keyboard modifiers, tracks the most recently interacted key,
- * and provides callback mechanisms for key press, release, and repeat actions.
- * This class is designed to work with the GLFW library.
- * <p>
- * This class is not instantiable and provides only static methods and fields.
+ * The {@code Keyboard} class provides static utilities for managing keyboard input
+ * using the GLFW library. It tracks the current key state, modifier state, and
+ * dispatches key events through the JGL event system.
+ *
+ * <p>This class is non-instantiable and acts as a global keyboard input manager.
+ * It stores a GLFW key callback and exposes helper methods to query whether
+ * specific modifier keys or key codes are currently active.</p>
+ *
+ * <p>Usage typically involves:</p>
+ * <ul>
+ *     <li>Calling {@link #init()} during window initialization to register the GLFW callback.</li>
+ *     <li>Using {@link #dispose()} when shutting down to free the callback.</li>
+ *     <li>Polling {@link #isKeyDown(int)} or modifier checks during gameplay or UI input.</li>
+ * </ul>
+ *
+ * @author Albert Beaupre
+ * @since February 16th, 2025
  */
 public final class Keyboard {
 
     /**
-     * Callback handler for keyboard input events within the application.
-     * This variable is responsible for processing key events, such as key presses,
-     * releases, and repeats, using the GLFW key callback mechanism.
-     * <p>
-     * The callback method is invoked whenever a key action occurs, and its primary
-     * purpose is to handle modifier updates and key interaction states.
-     * <p>
-     * Usage:
-     * - It is initialized with specific behavior in the {@code init} method of the
-     * Keyboard class, where the key events are bound to corresponding actions such as:
-     * - Modifier state updates: Tracks changes in key modifiers (e.g., Shift, Control).
-     * - Last key tracking: Maintains a reference to the most recently interacted key.
-     * - Custom key processing: Delegates to methods like {@code onKeyPress}, {@code onKeyRelease},
-     * or {@code onKeyRepeat} depending on the specific key action.
-     * <p>
-     * - Properly disposed of in the {@code dispose} method to free resources and prevent memory leaks.
-     * <p>
-     * This ensures smooth and efficient keyboard input handling for the application.
+     * The GLFW key callback responsible for handling key press, release, and repeat
+     * events. GLFW invokes this callback whenever a keyboard action occurs in the
+     * active window. Inside the callback, modifier keys are updated and JGL events
+     * are published accordingly.
+     *
+     * <p>This callback is installed in {@link #init()} and should be freed using
+     * {@link #dispose()} to avoid memory leaks.</p>
      */
     private static GLFWKeyCallback keyCallback;
 
+    /**
+     * Stores the most recently pressed key. If no key is pressed, this value becomes -1.
+     * This value is updated whenever GLFW detects a key press or repeat event.
+     */
+    private static short currentKey;
+
+    /**
+     * Tracks the current state of modifier keys (Shift, Control, Alt, Super).
+     * This is a bitwise mask composed of GLFW modifier constants.
+     */
+    private static byte modifierState;
+
+    /**
+     * Private constructor to prevent instantiation. This class is designed to be
+     * accessed statically.
+     */
     private Keyboard() {
         // Inaccessible
     }
 
+    /**
+     * Initializes keyboard input by registering a GLFW key callback on the active window.
+     * This callback listens for key presses, releases, and repeat actions.
+     *
+     * <p>Inside the callback:</p>
+     * <ul>
+     *     <li>Updates the {@code currentKey}</li>
+     *     <li>Updates the {@code modifierState}</li>
+     *     <li>Publishes {@link KeyPressEvent} or {@link KeyReleaseEvent} accordingly</li>
+     * </ul>
+     */
     static void init() {
         keyCallback = glfwSetKeyCallback(Window.getAddress(), (win, key, scancode, action, mods) -> {
             if (key < 0 || key > GLFW_KEY_LAST)
                 return;
 
+            currentKey = (byte) key;
+            modifierState = (byte) mods;
+
             switch (action) {
-                case GLFW_PRESS, GLFW_REPEAT -> {
-
-
-                    JGL.publish(new KeyPressEvent(key, mods));
+                case GLFW_PRESS, GLFW_REPEAT -> JGL.publish(new KeyPressEvent(key, mods));
+                case GLFW_RELEASE -> {
+                    JGL.publish(new KeyReleaseEvent(key, mods));
+                    currentKey = -1;
                 }
-                case GLFW_RELEASE -> JGL.publish(new KeyReleaseEvent(key, mods));
             }
         });
     }
 
+    /**
+     * Frees the GLFW key callback, releasing native resources. This should be
+     * called when shutting down the application to avoid memory leaks.
+     */
     static void dispose() {
         if (keyCallback != null)
             keyCallback.free();
     }
 
+    /**
+     * Checks whether the given key is currently pressed.
+     *
+     * @param key the GLFW key code
+     * @return {@code true} if the key is the current active key, otherwise {@code false}
+     */
+    public static boolean isKeyDown(int key) {
+        return key == currentKey;
+    }
+
+    /**
+     * Determines whether either Shift key is currently held down.
+     *
+     * @return {@code true} if Shift is pressed
+     */
+    public boolean isShiftDown() {
+        return (modifierState & GLFW_MOD_SHIFT) != 0;
+    }
+
+    /**
+     * Determines whether either Control key is currently held down.
+     *
+     * @return {@code true} if Control is pressed
+     */
+    public boolean isCtrlDown() {
+        return (modifierState & GLFW_MOD_CONTROL) != 0;
+    }
+
+    /**
+     * Determines whether either Alt key is currently held down.
+     *
+     * @return {@code true} if Alt is pressed
+     */
+    public boolean isAltDown() {
+        return (modifierState & GLFW_MOD_ALT) != 0;
+    }
+
+    /**
+     * Determines whether either Super key (Windows key / Command key) is held down.
+     *
+     * @return {@code true} if Super is pressed
+     */
+    public boolean isSuperDown() {
+        return (modifierState & GLFW_MOD_SUPER) != 0;
+    }
+
+    /** Unknown key constant. */
     public static final int UNKNOWN = -1;
 
+    /** Space key. */
     public static final int SPACE = 32;
+
+    /** Apostrophe key ('). */
     public static final int APOSTROPHE = 39;
+
+    /** Comma key (,). */
     public static final int COMMA = 44;
+
+    /** Minus key (-). */
     public static final int MINUS = 45;
+
+    /** Period key (.). */
     public static final int PERIOD = 46;
+
+    /** Slash key (/). */
     public static final int SLASH = 47;
 
+    // 0–9 digit keys
     public static final int KEY_0 = 48;
     public static final int KEY_1 = 49;
     public static final int KEY_2 = 50;
@@ -87,9 +175,13 @@ public final class Keyboard {
     public static final int KEY_8 = 56;
     public static final int KEY_9 = 57;
 
+    /** Semicolon key (;). */
     public static final int SEMICOLON = 59;
+
+    /** Equals key (=). */
     public static final int EQUAL = 61;
 
+    // A–Z letter keys
     public static final int A = 65;
     public static final int B = 66;
     public static final int C = 67;
@@ -117,14 +209,25 @@ public final class Keyboard {
     public static final int Y = 89;
     public static final int Z = 90;
 
+    /** Left bracket key ([). */
     public static final int LEFT_BRACKET = 91;
+
+    /** Backslash key (\). */
     public static final int BACKSLASH = 92;
+
+    /** Right bracket key (]). */
     public static final int RIGHT_BRACKET = 93;
+
+    /** Grave accent key (`). */
     public static final int GRAVE_ACCENT = 96;
 
+    /** Non-US key #1. */
     public static final int WORLD_1 = 161;
+
+    /** Non-US key #2. */
     public static final int WORLD_2 = 162;
 
+    // Function / control keys
     public static final int ESCAPE = 256;
     public static final int ENTER = 257;
     public static final int TAB = 258;
@@ -145,6 +248,7 @@ public final class Keyboard {
     public static final int PRINT_SCREEN = 283;
     public static final int PAUSE = 284;
 
+    // Function keys F1–F25
     public static final int F1 = 290;
     public static final int F2 = 291;
     public static final int F3 = 292;
@@ -171,6 +275,7 @@ public final class Keyboard {
     public static final int F24 = 313;
     public static final int F25 = 314;
 
+    // Keypad keys
     public static final int KP_0 = 320;
     public static final int KP_1 = 321;
     public static final int KP_2 = 322;
@@ -189,6 +294,7 @@ public final class Keyboard {
     public static final int KP_ENTER = 335;
     public static final int KP_EQUAL = 336;
 
+    // Modifier keys
     public static final int LEFT_SHIFT = 340;
     public static final int LEFT_CONTROL = 341;
     public static final int LEFT_ALT = 342;

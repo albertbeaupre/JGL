@@ -3,22 +3,23 @@ package jgl;
 import jgl.event.Event;
 import jgl.event.EventListener;
 import jgl.event.EventPublisher;
-import static org.lwjgl.glfw.GLFW.glfwGetTime;
-import static org.lwjgl.glfw.GLFW.glfwInit;
-import static org.lwjgl.glfw.GLFW.glfwPollEvents;
-import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
-import static org.lwjgl.glfw.GLFW.glfwTerminate;
+
+import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.glClear;
 
 /**
  * The JGL class serves as the main entry point for managing OpenGL-based applications
  * using GLFW. It provides methods to initialize and run an application, track frame
  * rate and time, and release resources.
+ *
+ * @author Albert Beaupre
+ * @since October 17th, 2025
  */
 public class JGL {
 
-
     private static final EventPublisher events = new EventPublisher();
-    private static double deltaTime;
+    private static float deltaTime;
     private static short framesPerSecond;
 
     /**
@@ -41,13 +42,15 @@ public class JGL {
         Mouse.init();
         Keyboard.init();
 
-        double lastTime = glfwGetTime();
-        double fpsTime = 0;
+        float lastTime = (float) glfwGetTime();
+        float fpsTime = 0;
         short frames = 0;
 
         application.init();
         while (!Window.shouldClose()) {
-            double now = glfwGetTime();
+            glClear(GL_COLOR_BUFFER_BIT);
+
+            float now = (float) glfwGetTime();
             deltaTime = now - lastTime;
             lastTime = now;
 
@@ -110,7 +113,7 @@ public class JGL {
      *
      * @return The current frames per second as a double.
      */
-    public static double getFramesPerSecond() {
+    public static short getFramesPerSecond() {
         return framesPerSecond;
     }
 
@@ -121,7 +124,7 @@ public class JGL {
      *
      * @return The time difference (delta time) in seconds as a double.
      */
-    public static double getDeltaTime() {
+    public static float getDeltaTime() {
         return deltaTime;
     }
 

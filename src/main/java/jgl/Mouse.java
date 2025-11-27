@@ -8,36 +8,92 @@ import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWMouseButtonCallback;
 import org.lwjgl.glfw.GLFWScrollCallback;
 
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LAST;
-import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
-import static org.lwjgl.glfw.GLFW.glfwSetCursorPosCallback;
-import static org.lwjgl.glfw.GLFW.glfwSetMouseButtonCallback;
-import static org.lwjgl.glfw.GLFW.glfwSetScrollCallback;
+import static org.lwjgl.glfw.GLFW.*;
 
 /**
- * The Mouse class provides functionality for handling mouse input in a GLFW-based application.
- * It manages mouse movement, button clicks, and scroll events.
- * This is a utility class with only static methods and fields, and cannot be instantiated.
- * <p>
- * Key features:
- * - Tracks the current mouse cursor position.
- * - Tracks the current state of mouse buttons.
- * - Tracks scroll wheel activity in both X and Y directions.
- * - Tracks modifier keys (Shift, Ctrl, Alt, Super) during mouse events.
+ * The {@code Mouse} class provides static utilities for handling mouse input within
+ * a GLFW-based application. It tracks cursor movement, button interactions, scroll
+ * wheel input, and modifier states (Shift, Ctrl, Alt, Super).
+ *
+ * <p>This class contains only static behavior and cannot be instantiated, serving
+ * as a global mouse manager used throughout the JGL framework.</p>
+ *
+ * <p>Primary responsibilities include:</p>
+ * <ul>
+ *     <li>Tracking the current mouse cursor position.</li>
+ *     <li>Tracking which mouse buttons are currently held down.</li>
+ *     <li>Receiving scroll wheel input on both X and Y axes.</li>
+ *     <li>Publishing corresponding mouse events through the JGL event system.</li>
+ *     <li>Updating modifier key states during mouse interactions.</li>
+ * </ul>
+ *
+ * <p>To use this system, call {@link #init()} during window initialization and
+ * {@link #dispose()} during shutdown.</p>
+ *
+ * @author Albert Beaupre
+ * @since February 16th, 2025
  */
 public final class Mouse {
 
+    /**
+     * GLFW callback for handling mouse movement. This callback updates cursor
+     * coordinates and publishes a {@link MouseMoveEvent} whenever the user moves
+     * the mouse cursor.
+     */
     private static GLFWCursorPosCallback cursorPosCallback;
+
+    /**
+     * GLFW callback for handling mouse button interactions. This callback receives
+     * button press and release actions and publishes {@link MousePressEvent} or
+     * {@link MouseReleaseEvent} as appropriate.
+     */
     private static GLFWMouseButtonCallback mouseButtonCallback;
+
+    /**
+     * GLFW callback for handling scroll wheel input. Publishes {@link MouseScrollEvent}
+     * whenever vertical or horizontal scrolling occurs.
+     */
     private static GLFWScrollCallback scrollCallback;
 
+    /**
+     * The current X position of the mouse cursor relative to the window.
+     */
     private static short x;
+
+    /**
+     * The current Y position of the mouse cursor relative to the window.
+     */
     private static short y;
 
+    /**
+     * Bitmask of mouse button states, where each bit corresponds to a mouse button.
+     */
+    private static byte buttonState;
+
+    /**
+     * Bitmask representing the current state of modifier keys (Shift, Control, Alt, Super).
+     */
+    private static byte modifierState;
+
+    /**
+     * Represents the horizontal scroll offset of the mouse wheel.
+     */
+    private static byte scrollX;
+    private static byte scrollY;
+
+    /**
+     * Private constructor prevents instantiation. This class is purely static.
+     */
     private Mouse() {
         // Inaccessible
     }
 
+    /**
+     * Initializes all GLFW mouse callbacks for movement, button input, and scroll wheel
+     * actions. These callbacks publish the appropriate JGL mouse events as input is detected.
+     *
+     * <p>This method should be called once during window or engine initialization.</p>
+     */
     static void init() {
         cursorPosCallback = glfwSetCursorPosCallback(Window.getAddress(), (win, xpos, ypos) -> {
             short fromX = x;
@@ -48,72 +104,151 @@ public final class Mouse {
         });
 
         mouseButtonCallback = glfwSetMouseButtonCallback(Window.getAddress(), (win, button, action, mods) -> {
-            if (button < 0 || button > GLFW_MOUSE_BUTTON_LAST)
-                return;
+            if (button < 0 || button > GLFW_MOUSE_BUTTON_LAST) return;
 
-            if (action != GLFW_RELEASE) {
-                JGL.publish(new MouseReleaseEvent(x, y, button, mods));
-            } else {
+            if (action == GLFW_PRESS) {
+                // Fire press event
                 JGL.publish(new MousePressEvent(x, y, button, mods));
+                // Set flag
+                buttonState |= (byte) (1 << button);
+            } else if (action == GLFW_RELEASE) {
+                // Fire release event
+                JGL.publish(new MouseReleaseEvent(x, y, button, mods));
+                // Clear flag
+                buttonState &= (byte) ~(1 << button);
             }
+
+            modifierState = (byte) mods;
         });
+
 
         scrollCallback = glfwSetScrollCallback(Window.getAddress(), (win, xoff, yoff) -> {
             JGL.publish(new MouseScrollEvent((int) xoff, (int) yoff));
+
+            scrollX = (byte) xoff;
+            scrollY = (byte) yoff;
         });
     }
 
+    /**
+     * Frees all GLFW mouse-related callbacks. This should be called upon closing
+     * the window or shutting down the engine to avoid native memory leaks.
+     */
     static void dispose() {
         if (cursorPosCallback != null) cursorPosCallback.free();
         if (mouseButtonCallback != null) mouseButtonCallback.free();
         if (scrollCallback != null) scrollCallback.free();
     }
 
+    /**
+     * Returns the current x-coordinate of the mouse cursor.
+     *
+     * @return the cursor's x position
+     */
     public static short getX() {
         return x;
     }
 
+    /**
+     * Returns the current y-coordinate of the mouse cursor.
+     *
+     * @return the cursor's y position
+     */
     public static short getY() {
         return y;
     }
 
+    public static byte getScrollX() {
+        return scrollX;
+    }
+
+    public static byte getScrollY() {
+        return scrollY;
+    }
+
     /**
-     * Left mouse button (button 0).
+     * Determines whether a specific mouse button is currently pressed.
+     *
+     * @param button the button index (e.g., {@link #LEFT}, {@link #RIGHT})
+     * @return {@code true} if the button is currently held down
+     */
+    public static boolean isButtonDown(int button) {
+        return (buttonState & (1 << button)) != 0;
+    }
+
+    /**
+     * Returns whether the Shift modifier key is active during mouse interaction.
+     *
+     * @return {@code true} if Shift is pressed
+     */
+    public boolean isShiftDown() {
+        return (modifierState & GLFW_MOD_SHIFT) != 0;
+    }
+
+    /**
+     * Returns whether the Control modifier key is active during mouse interaction.
+     *
+     * @return {@code true} if Control is pressed
+     */
+    public boolean isCtrlDown() {
+        return (modifierState & GLFW_MOD_CONTROL) != 0;
+    }
+
+    /**
+     * Returns whether the Alt modifier key is active during mouse interaction.
+     *
+     * @return {@code true} if Alt is pressed
+     */
+    public boolean isAltDown() {
+        return (modifierState & GLFW_MOD_ALT) != 0;
+    }
+
+    /**
+     * Returns whether the Super modifier key (Windows key / Command key) is active.
+     *
+     * @return {@code true} if Super is pressed
+     */
+    public boolean isSuperDown() {
+        return (modifierState & GLFW_MOD_SUPER) != 0;
+    }
+
+    /**
+     * Left mouse button (button index 0).
      */
     public static final int LEFT = 0;
 
     /**
-     * Right mouse button (button 1).
+     * Right mouse button (button index 1).
      */
     public static final int RIGHT = 1;
 
     /**
-     * Middle mouse button (button 2).
+     * Middle mouse button (button index 2), usually the scroll wheel click.
      */
     public static final int MIDDLE = 2;
 
     /**
-     * Mouse button 3 (usually side / extra button 1).
+     * Extra mouse button #3 (typically side/back button).
      */
     public static final int BUTTON_3 = 3;
 
     /**
-     * Mouse button 4 (usually side / extra button 2).
+     * Extra mouse button #4 (typically side/forward button).
      */
     public static final int BUTTON_4 = 4;
 
     /**
-     * Mouse button 5 (usually side / extra button 3).
+     * Extra mouse button #5.
      */
     public static final int BUTTON_5 = 5;
 
     /**
-     * Mouse button 6 (usually side / extra button 4).
+     * Extra mouse button #6.
      */
     public static final int BUTTON_6 = 6;
 
     /**
-     * Mouse button 7 (usually side / extra button 5).
+     * Extra mouse button #7.
      */
     public static final int BUTTON_7 = 7;
 }

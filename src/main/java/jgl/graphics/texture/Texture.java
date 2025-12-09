@@ -232,8 +232,8 @@ public class Texture {
         float oldScaleY = this.scaleY;
 
         // Prevent divide-by-zero and invalid first-scale
-        if (oldScaleX != 0) origin.x = origin.x * (sx / oldScaleX);
-        if (oldScaleY != 0) origin.y = origin.y * (sy / oldScaleY);
+        if (oldScaleX != 0) origin.setX(origin.getX() * (sx / oldScaleX));
+        if (oldScaleY != 0) origin.setY(origin.getY() * (sy / oldScaleY));
 
         this.scaleX = sx;
         this.scaleY = sy;
@@ -546,8 +546,8 @@ public class Texture {
      * the raw quad positions prior to transformation.</p>
      */
     private void updateLocalVertices() {
-        float ox = origin.x;
-        float oy = origin.y;
+        float ox = origin.getX();
+        float oy = origin.getY();
 
         float scaledW = width * scaleX;
         float scaledH = height * scaleY;
@@ -569,8 +569,8 @@ public class Texture {
      * Rebuilds the final vertex buffer by applying rotation and world translation.
      */
     private void updateVertexBuffer() {
-        float px = x + origin.x;
-        float py = y + origin.y;
+        float px = x + origin.getX();
+        float py = y + origin.getY();
 
         for (int i = 0; i < 4; i++) {
             float lx = localVertices[i * 2];

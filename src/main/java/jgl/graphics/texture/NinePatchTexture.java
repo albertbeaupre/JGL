@@ -129,8 +129,8 @@ public class NinePatchTexture extends Texture {
         float totalH = getHeight();
 
         // Rotation pivot (same as Texture)
-        float originX = getOrigin().x;
-        float originY = getOrigin().y;
+        float originX = getOrigin().getX();
+        float originY = getOrigin().getY();
 
         float rot = getRotation();
         float rad = (float) Math.toRadians(-rot);

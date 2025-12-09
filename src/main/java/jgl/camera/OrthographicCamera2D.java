@@ -46,13 +46,13 @@ public class OrthographicCamera2D extends Camera2D {
      */
     @Override
     public void rebuild(float worldWidth, float worldHeight) {
-        float halfW = (worldWidth  * 0.5f) / zoom;
+        float halfW = (worldWidth * 0.5f) / zoom;
         float halfH = (worldHeight * 0.5f) / zoom;
 
-        float left   = center.x - halfW;
-        float right  = center.x + halfW;
-        float bottom = center.y - halfH;
-        float top    = center.y + halfH;
+        float left = center.getX() - halfW;
+        float right = center.getX() + halfW;
+        float bottom = center.getY() - halfH;
+        float top = center.getY() + halfH;
 
         // Construct a classic orthographic projection
         projection.ortho(left, right, bottom, top, -1f, 1f);

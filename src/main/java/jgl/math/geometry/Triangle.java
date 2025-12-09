@@ -18,27 +18,33 @@ public class Triangle extends Shape {
     @Override
     public float getWidth() {
         float x1 = this.getX();
-        float maxX = MathUtils.max(x1, x2, x3);
-        float minX = MathUtils.min(x1, x2, x3);
+        float dx2 = x2 - x1;
+        float dx3 = x3 - x1;
+
+        float maxDx = MathUtils.max(Math.abs(dx2), Math.abs(dx3));
         float borderThickness = 0;
 
         if (this.getBorder() != null)
             borderThickness = this.getBorder().getThickness() * 6;
 
-        return maxX - minX + borderThickness;
+        // Domain is symmetric around vertex 1 as origin: [-maxDx, +maxDx]
+        return maxDx * 2.0f + borderThickness;
     }
 
     @Override
     public float getHeight() {
         float y1 = this.getY();
-        float maxY = MathUtils.max(y1, y2, y3);
-        float minY = MathUtils.min(y1, y2, y3);
+        float dy2 = y2 - y1;
+        float dy3 = y3 - y1;
+
+        float maxDy = MathUtils.max(Math.abs(dy2), Math.abs(dy3));
         float borderThickness = 0;
 
         if (this.getBorder() != null)
             borderThickness = this.getBorder().getThickness() * 6;
 
-        return maxY - minY + borderThickness;
+        // Domain is symmetric around vertex 1 as origin: [-maxDy, +maxDy]
+        return maxDy * 2.0f + borderThickness;
     }
 
     public float getX2() {

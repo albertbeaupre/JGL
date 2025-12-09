@@ -1,16 +1,13 @@
 package jgl.math.geometry;
 
+import jgl.graphics.Color;
+
 public abstract class Shape {
-    private ShapeRenderer renderer;
     private int index;
     private float x, y, rotation = 0, scaleX = 1, scaleY = 1, transformX, transformY;
     private float width, height;
     private Color color = new Color(0);
     private Border border;
-
-    protected void setRenderer(ShapeRenderer renderer) {
-        this.renderer = renderer;
-    }
 
     public float getX() {
         return x;

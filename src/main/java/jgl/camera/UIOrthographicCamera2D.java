@@ -53,7 +53,6 @@ public class UIOrthographicCamera2D extends Camera2D {
      */
     @Override
     public void rebuild(float worldWidth, float worldHeight) {
-
         float w = worldWidth / zoom;
         float h = worldHeight / zoom;
 
@@ -63,6 +62,6 @@ public class UIOrthographicCamera2D extends Camera2D {
         float bottom = center.y + h;
 
         // Build a top-left aligned orthographic projection for UI rendering
-        projection.identity().ortho(left, right, bottom, top, -1f, 1f);
+        projection.ortho(left, right, bottom, top, -1f, 1f);
     }
 }

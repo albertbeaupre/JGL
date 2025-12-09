@@ -1,17 +1,19 @@
-package jgl.graphics;
+package jgl.graphics.texture;
 
+import jgl.graphics.Color;
 import jgl.math.Vector2f;
 import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
 
 /**
  * Represents a 2D textured quad rendered using legacy OpenGL (fixed-function pipeline).
  *
  * <p>This class manages a texture's transform (position, size, rotation, origin),
- * its UV region, and its vertex data. It pre-allocates vertex and UV buffers to avoid
+ * its UV region, and its vertex buffer. It pre-allocates vertex and UV buffers to avoid
  * repeated memory allocation and updates them incrementally whenever properties change.</p>
  *
  * <p>The rendering strategy uses {@code glVertexPointer}, {@code glTexCoordPointer},
@@ -33,15 +35,9 @@ import static org.lwjgl.opengl.GL11.*;
 public class Texture {
 
     /**
-     * Global flag indicating whether fixed-function texture rendering has been initialized.
-     * Enables client states only once to avoid redundant calls.
-     */
-    private static boolean textureRenderingEnabled = false;
-
-    /**
      * The OpenGL texture handle.
      */
-    private final int textureID;
+    private final TextureData data;
 
     /**
      * Vertex buffer storing 4 (x,y) pairs for the quad.
@@ -71,7 +67,13 @@ public class Texture {
     /**
      * Current filtering mode used for this texture.
      */
-    private TextureFilter filter = TextureFilter.LINEAR;
+    private TextureFilter filter = TextureFilter.NEAREST;
+
+    /**
+     * Represents the unique identifier for a texture resource
+     * used in rendering or graphical operations.
+     */
+    private final int textureID;
 
     /**
      * Width of the rendered quad in world units.
@@ -96,22 +98,22 @@ public class Texture {
     /**
      * UV region left coordinate.
      */
-    private float texLeft;
+    private float leftRegion;
 
     /**
      * UV region top coordinate.
      */
-    private float texTop;
+    private float topRegion;
 
     /**
      * UV region right coordinate, defaults to 1.
      */
-    private float texRight = 1f;
+    private float rightRegion = 1f;
 
     /**
      * UV region bottom coordinate, defaults to 1.
      */
-    private float texBottom = 1f;
+    private float bottomRegion = 1f;
 
     /**
      * Rotation angle in degrees.
@@ -121,8 +123,7 @@ public class Texture {
     /**
      * Cached sine and cosine of the rotation angle.
      */
-    private float sinRot;
-    private float cosRot = 1f;
+    private float sinRot, cosRot = 1f;
 
     /**
      * Tracks whether the texture's UVs are currently flipped horizontally.
@@ -145,42 +146,58 @@ public class Texture {
     private float scaleY = 1f;
 
     /**
+     * Represents the color property used to define the visual appearance
+     * or aesthetic attributes of an object.
+     */
+    private Color color = Color.WHITE;
+
+    /**
      * Loads a texture from a file path using {@link TextureData}.
      *
      * @param path path to the image file
      */
     public Texture(String path) {
-        this(TextureData.loadTexture(path));
+        this(TextureData.load(path));
     }
 
     /**
-     * Loads a texture from raw image data.
+     * Loads a texture from raw image buffer.
      *
      * @param data PNG/JPEG/etc. byte array
      */
     public Texture(byte[] data) {
-        this(TextureData.loadTexture(data));
+        this(TextureData.load(data));
     }
 
     /**
      * Internal constructor used after {@link TextureData} creation.
-     * Initializes vertex data, UV buffers, and enables client states on first usage.
+     * Initializes vertex buffer, UV buffers, and enables client states on first usage.
      *
-     * @param texture the texture data container
+     * @param data the texture buffer container
      */
-    public Texture(TextureData texture) {
-        this.textureID = texture.ID();
-        this.width = texture.width();
-        this.height = texture.height();
+    public Texture(TextureData data) {
+        // Generate an OpenGL texture object.
+        this.textureID = glGenTextures();
+        glBindTexture(GL_TEXTURE_2D, textureID);
+
+        // Configure texture filtering for minification and magnification.
+        // Linear filtering gives smoother results for scaled textures.
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter.minFilter);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter.magFilter);
+
+        // Clamp texture edges to prevent bleeding when sampling near borders.
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+        // Upload the pixel buffer to the GPU using 8-bit RGBA format.
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, data.width(), data.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, data.buffer());
+
+        this.data = data;
+        this.width = data.width();
+        this.height = data.height();
         updateLocalVertices();
         updateUVBuffer();
-
-        if (!textureRenderingEnabled) {
-            textureRenderingEnabled = true;
-            glEnableClientState(GL_VERTEX_ARRAY);
-            glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-            glEnable(GL_TEXTURE_2D);
-        }
+        updateVertexBuffer();
     }
 
     /**
@@ -251,15 +268,15 @@ public class Texture {
      * Only the UV mapping is altered—no vertex positions or orientation values
      * are modified. This makes the method extremely fast and suitable for
      * sprite mirroring, character direction changes, and flipping texture regions
-     * defined via {@link #setTextureRegion(float, float, float, float)}.</p>
+     * defined via {@link #setRegion(float, float, float, float)}.</p>
      *
      * <p>After swapping the UV values, {@link #updateUVBuffer()} is called
      * to commit the new UV layout to the GPU client-side buffer.</p>
      */
     public void flipX() {
-        float temp = texLeft;
-        texLeft = texRight;
-        texRight = temp;
+        float temp = leftRegion;
+        leftRegion = rightRegion;
+        rightRegion = temp;
         updateUVBuffer();
     }
 
@@ -276,9 +293,9 @@ public class Texture {
      * UV coordinate buffer used during rendering.</p>
      */
     public void flipY() {
-        float temp = texTop;
-        texTop = texBottom;
-        texBottom = temp;
+        float temp = topRegion;
+        topRegion = bottomRegion;
+        bottomRegion = temp;
         updateUVBuffer();
     }
 
@@ -352,6 +369,8 @@ public class Texture {
      * @param y world Y coordinate
      */
     public void setPosition(float x, float y) {
+        if (this.x == x && this.y == y)
+            return;
         this.x = x;
         this.y = y;
         updateVertexBuffer();
@@ -422,11 +441,11 @@ public class Texture {
      * @param right  u-coordinate of the right side
      * @param bottom v-coordinate of the bottom side
      */
-    public void setTextureRegion(float left, float top, float right, float bottom) {
-        this.texLeft = left;
-        this.texTop = top;
-        this.texRight = right;
-        this.texBottom = bottom;
+    public void setRegion(float left, float top, float right, float bottom) {
+        this.leftRegion = left / data.width();
+        this.topRegion = top / data.height();
+        this.rightRegion = right / data.width();
+        this.bottomRegion = bottom / data.height();
         updateUVBuffer();
     }
 
@@ -435,14 +454,14 @@ public class Texture {
      * Order: top-left → top-right → bottom-right → bottom-left.
      */
     private void updateUVBuffer() {
-        uvBuffer.put(0, texLeft);
-        uvBuffer.put(1, texTop);
-        uvBuffer.put(2, texRight);
-        uvBuffer.put(3, texTop);
-        uvBuffer.put(4, texRight);
-        uvBuffer.put(5, texBottom);
-        uvBuffer.put(6, texLeft);
-        uvBuffer.put(7, texBottom);
+        uvBuffer.put(0, leftRegion);
+        uvBuffer.put(1, topRegion);
+        uvBuffer.put(2, rightRegion);
+        uvBuffer.put(3, topRegion);
+        uvBuffer.put(4, rightRegion);
+        uvBuffer.put(5, bottomRegion);
+        uvBuffer.put(6, leftRegion);
+        uvBuffer.put(7, bottomRegion);
     }
 
     /**
@@ -490,12 +509,34 @@ public class Texture {
         updateVertexBuffer();
     }
 
-
     /**
      * @return current origin vector
      */
     public Vector2f getOrigin() {
         return origin;
+    }
+
+    /**
+     * @return the {@link TextureData} instance containing the raw image buffer
+     */
+    public TextureData getData() {
+        return data;
+    }
+
+    /**
+     * @return the color of the object
+     */
+    public Color getColor() {
+        return color;
+    }
+
+    /**
+     * Sets the color of the object.
+     *
+     * @param color the Color object to set
+     */
+    public void setColor(Color color) {
+        this.color = color;
     }
 
     /**
@@ -557,10 +598,32 @@ public class Texture {
      * must already be active.</p>
      */
     public void draw() {
+        glColor4f(color.getR(), color.getG(), color.getB(), color.getA());
         glBindTexture(GL_TEXTURE_2D, textureID);
         glVertexPointer(2, GL_FLOAT, 0, vertexBuffer);
         glTexCoordPointer(2, GL_FLOAT, 0, uvBuffer);
         glDrawArrays(GL_QUADS, 0, 4);
     }
 
+    /**
+     * Releases resources associated with the texture.
+     * <p>
+     * This method disposes of the underlying OpenGL texture by delegating
+     * the cleanup to the {@link TextureData} instance. After calling this method,
+     * the texture becomes unusable, and any attempts to render it will likely result
+     * in errors or undefined behavior. It is crucial to call this method
+     * when the texture is no longer needed to free GPU memory.
+     */
+    public void dispose() {
+        glDeleteTextures(textureID);
+    }
+
+    /**
+     * Retrieves the unique identifier for the texture.
+     *
+     * @return the texture ID as an integer
+     */
+    public int getID() {
+        return textureID;
+    }
 }

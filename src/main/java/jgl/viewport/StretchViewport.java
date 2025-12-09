@@ -7,11 +7,11 @@ public class StretchViewport extends Viewport {
 
     @Override
     public void update(int screenWidth, int screenHeight) {
-        this.screenX = 0;
-        this.screenY = 0;
-        this.screenWidth = screenWidth;
-        this.screenHeight = screenHeight;
+        this.x = 0;
+        this.y = 0;
+        this.width = screenWidth;
+        this.height = screenHeight;
 
-        projectionMatrix.identity().ortho(0, worldWidth, 0, worldHeight, -1f, 1f);
+        projectionMatrix.ortho(0, worldWidth, 0, worldHeight, -1f, 1f);
     }
 }

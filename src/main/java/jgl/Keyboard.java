@@ -142,25 +142,39 @@ public final class Keyboard {
         return (modifierState & GLFW_MOD_SUPER) != 0;
     }
 
-    /** Unknown key constant. */
+    /**
+     * Unknown key constant.
+     */
     public static final int UNKNOWN = -1;
 
-    /** Space key. */
+    /**
+     * Space key.
+     */
     public static final int SPACE = 32;
 
-    /** Apostrophe key ('). */
+    /**
+     * Apostrophe key (').
+     */
     public static final int APOSTROPHE = 39;
 
-    /** Comma key (,). */
+    /**
+     * Comma key (,).
+     */
     public static final int COMMA = 44;
 
-    /** Minus key (-). */
+    /**
+     * Minus key (-).
+     */
     public static final int MINUS = 45;
 
-    /** Period key (.). */
+    /**
+     * Period key (.).
+     */
     public static final int PERIOD = 46;
 
-    /** Slash key (/). */
+    /**
+     * Slash key (/).
+     */
     public static final int SLASH = 47;
 
     // 0–9 digit keys
@@ -175,10 +189,14 @@ public final class Keyboard {
     public static final int KEY_8 = 56;
     public static final int KEY_9 = 57;
 
-    /** Semicolon key (;). */
+    /**
+     * Semicolon key (;).
+     */
     public static final int SEMICOLON = 59;
 
-    /** Equals key (=). */
+    /**
+     * Equals key (=).
+     */
     public static final int EQUAL = 61;
 
     // A–Z letter keys
@@ -209,22 +227,34 @@ public final class Keyboard {
     public static final int Y = 89;
     public static final int Z = 90;
 
-    /** Left bracket key ([). */
+    /**
+     * Left bracket key ([).
+     */
     public static final int LEFT_BRACKET = 91;
 
-    /** Backslash key (\). */
+    /**
+     * Backslash key (\).
+     */
     public static final int BACKSLASH = 92;
 
-    /** Right bracket key (]). */
+    /**
+     * Right bracket key (]).
+     */
     public static final int RIGHT_BRACKET = 93;
 
-    /** Grave accent key (`). */
+    /**
+     * Grave accent key (`).
+     */
     public static final int GRAVE_ACCENT = 96;
 
-    /** Non-US key #1. */
+    /**
+     * Non-US key #1.
+     */
     public static final int WORLD_1 = 161;
 
-    /** Non-US key #2. */
+    /**
+     * Non-US key #2.
+     */
     public static final int WORLD_2 = 162;
 
     // Function / control keys
@@ -304,4 +334,62 @@ public final class Keyboard {
     public static final int RIGHT_ALT = 346;
     public static final int RIGHT_SUPER = 347;
     public static final int MENU = 348;
+
+    /**
+     * Converts a GLFW key ID to the corresponding printable character.
+     * Returns '\0' if the key does not produce a character.
+     *
+     * @param key the GLFW key code
+     * @return the character for this key, or '\0' if not printable
+     */
+    public static char getKeyChar(int key) {
+        boolean shift = (modifierState & GLFW_MOD_SHIFT) != 0;
+
+        // Letters A–Z
+        if (key >= A && key <= Z) {
+            char base = (char) ('a' + (key - A));
+            return shift ? Character.toUpperCase(base) : base;
+        }
+
+        // Numbers 0–9 (top row)
+        if (key >= KEY_0 && key <= KEY_9) {
+            if (!shift) {
+                return (char) key; // '0'–'9'
+            }
+
+            // Shifted number row symbols
+            return switch (key) {
+                case KEY_1 -> '!';
+                case KEY_2 -> '@';
+                case KEY_3 -> '#';
+                case KEY_4 -> '$';
+                case KEY_5 -> '%';
+                case KEY_6 -> '^';
+                case KEY_7 -> '&';
+                case KEY_8 -> '*';
+                case KEY_9 -> '(';
+                case KEY_0 -> ')';
+                default -> '\0';
+            };
+        }
+
+        // Punctuation & shift variants
+        return switch (key) {
+            case SPACE -> ' ';
+            case MINUS -> shift ? '_' : '-';
+            case EQUAL -> shift ? '+' : '=';
+            case LEFT_BRACKET -> shift ? '{' : '[';
+            case RIGHT_BRACKET -> shift ? '}' : ']';
+            case BACKSLASH -> shift ? '|' : '\\';
+            case SEMICOLON -> shift ? ':' : ';';
+            case APOSTROPHE -> shift ? '"' : '\'';
+            case COMMA -> shift ? '<' : ',';
+            case PERIOD -> shift ? '>' : '.';
+            case SLASH -> shift ? '?' : '/';
+            case GRAVE_ACCENT -> shift ? '~' : '`';
+
+            default -> '\0'; // Non-printable keys return null character
+        };
+    }
+
 }

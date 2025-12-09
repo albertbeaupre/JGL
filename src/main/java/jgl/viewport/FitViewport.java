@@ -11,17 +11,17 @@ public class FitViewport extends Viewport {
         float screenAspect = (float) screenWidth / (float) screenHeight;
 
         if (screenAspect > worldAspect) {
-            this.screenHeight = screenHeight;
-            this.screenWidth = (int) (screenHeight * worldAspect);
-            this.screenX = (screenWidth - this.screenWidth) / 2;
-            this.screenY = 0;
+            this.height = screenHeight;
+            this.width = (int) (screenHeight * worldAspect);
+            this.x = (screenWidth - this.width) / 2;
+            this.y = 0;
         } else {
-            this.screenWidth = screenWidth;
-            this.screenHeight = (int) (screenWidth / worldAspect);
-            this.screenX = 0;
-            this.screenY = (screenHeight - this.screenHeight) / 2;
+            this.width = screenWidth;
+            this.height = (int) (screenWidth / worldAspect);
+            this.x = 0;
+            this.y = (screenHeight - this.height) / 2;
         }
 
-        projectionMatrix.identity().ortho(0, worldWidth, 0, worldHeight, -1f, 1f);
+        projectionMatrix.ortho(0, worldWidth, 0, worldHeight, -1f, 1f);
     }
 }

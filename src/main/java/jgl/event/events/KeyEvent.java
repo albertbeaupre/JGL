@@ -1,5 +1,6 @@
 package jgl.event.events;
 
+import jgl.Keyboard;
 import jgl.event.Event;
 
 import static org.lwjgl.glfw.GLFW.GLFW_MOD_ALT;
@@ -19,6 +20,10 @@ public class KeyEvent extends Event {
 
     public short getKey() {
         return key;
+    }
+
+    public char getChar() {
+        return Keyboard.getKeyChar(key);
     }
 
     public boolean isShiftDown() {

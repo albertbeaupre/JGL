@@ -3,13 +3,13 @@ plugins {
     id 'application'
 }
 
-group = 'com.example'
+group = 'jgl'
 version = '1.0'
-description = 'LWJGL + NanoVG Example'
+description = 'Java Game Library'
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion = JavaLanguageVersion.of(23)
     }
 }
 
@@ -17,7 +17,6 @@ application {
     mainClass = 'com.example.NanoVGExample'
 }
 
-// Choose your platform: "windows", "linux", or "macos"
 def lwjglNatives = "natives-windows"
 
 repositories {
@@ -34,22 +33,24 @@ dependencies {
     implementation "org.lwjgl:lwjgl-opengl"
     implementation "org.lwjgl:lwjgl-nanovg"
     implementation "org.lwjgl:lwjgl-stb"
+    implementation "org.lwjgl:lwjgl-openal"
+    implementation "com.googlecode.soundlibs:mp3spi:1.9.5-1"
+    implementation "com.googlecode.soundlibs:tritonus-share:0.3.7-2"
 
     runtimeOnly "org.lwjgl:lwjgl::$lwjglNatives"
     runtimeOnly "org.lwjgl:lwjgl-glfw::$lwjglNatives"
     runtimeOnly "org.lwjgl:lwjgl-opengl::$lwjglNatives"
     runtimeOnly "org.lwjgl:lwjgl-nanovg::$lwjglNatives"
     runtimeOnly "org.lwjgl:lwjgl-stb::$lwjglNatives"
+    runtimeOnly "org.lwjgl:lwjgl-openal::$lwjglNatives"
 
     implementation "net.onedaybeard.artemis:artemis-odb:2.3.0"
 }
-
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
 
 tasks.run {
-    // optional: prevent Gradle from buffering console output
     standardInput = System.in
 }

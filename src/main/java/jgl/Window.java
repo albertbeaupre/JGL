@@ -10,7 +10,7 @@ import org.lwjgl.system.MemoryStack;
 import java.nio.IntBuffer;
 
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11.glViewport;
+import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 /**
@@ -101,6 +101,19 @@ public final class Window {
 
         glfwShowWindow(address);
         glViewport(0, 0, width, height);
+
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        glEnable(GL_TEXTURE_2D);
+
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glOrtho(0, Window.getWidth(), 0, Window.getHeight(), -1, 1);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
     }
 
     /**
@@ -112,7 +125,7 @@ public final class Window {
     public static void addWindowResizeListener(WindowResizeListener listener) {
         if (listener == null)
             throw new NullPointerException("A null WindowResizeListener cannot be added to the Window");
-        JGL.registerEventListener(WindowResizeEvent.class, listener);
+        JGL.subscribe(WindowResizeEvent.class, listener);
     }
 
     /**

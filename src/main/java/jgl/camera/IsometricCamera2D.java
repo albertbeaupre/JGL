@@ -65,7 +65,7 @@ public class IsometricCamera2D extends Camera2D {
         float top = center.y + halfH;
 
         // Start with a standard orthographic projection
-        projection.identity().ortho(left, right, bottom, top, -1f, 1f);
+        projection.ortho(left, right, bottom, top, -1f, 1f);
 
         // Apply a 45° world rotation (diamond orientation)
         projection.rotateZ((float) Math.toRadians(45));

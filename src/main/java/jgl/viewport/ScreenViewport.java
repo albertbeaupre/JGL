@@ -22,26 +22,13 @@ public class ScreenViewport extends Viewport {
      */
     @Override
     public void update(int screenWidth, int screenHeight) {
-        this.screenWidth = screenWidth;
-        this.screenHeight = screenHeight;
+        this.width = screenWidth;
+        this.height = screenHeight;
 
         // If you want world size to match screen size
         this.worldWidth = screenWidth;
         this.worldHeight = screenHeight;
 
-        projectionMatrix.identity().ortho(0, worldWidth, 0, worldHeight, -1f, 1f);
-    }
-
-    /**
-     * Updates only the projection matrix (world → clip space), without touching screen bounds.
-     */
-    public void updateWorld() {
-        if (camera != null) {
-            camera.rebuild(worldWidth, worldHeight);
-            camera.getProjection().get(mat);
-        } else {
-            projectionMatrix.identity().ortho(0, worldWidth, 0, worldHeight, -1f, 1f);
-            projectionMatrix.get(mat);
-        }
+        projectionMatrix.ortho(0, worldWidth, 0, worldHeight, -1f, 1f);
     }
 }

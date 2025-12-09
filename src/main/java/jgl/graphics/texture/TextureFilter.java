@@ -1,4 +1,4 @@
-package jgl.graphics;
+package jgl.graphics.texture;
 
 import static org.lwjgl.opengl.GL11.GL_LINEAR;
 import static org.lwjgl.opengl.GL11.GL_NEAREST;

@@ -1,5 +1,7 @@
 package jgl.math.geometry;
 
+import jgl.graphics.Color;
+
 public class Border {
 
     private Color color;

@@ -22,6 +22,7 @@ public class JGL {
     private static float deltaTime;
     private static short framesPerSecond;
 
+
     /**
      * Initializes the OpenGL-based application and sets up the main application loop.
      * This method initializes GLFW, creates the application window, manages input devices,
@@ -39,6 +40,7 @@ public class JGL {
             throw new IllegalStateException("Unable to initialize GLFW");
 
         Window.init(title, width, height);
+        Audio.init();
         Mouse.init();
         Keyboard.init();
 
@@ -69,6 +71,8 @@ public class JGL {
                 frames = 0;
             }
             glfwSwapBuffers(Window.getAddress());
+
+            Mouse.resetScroll();
         }
         application.dispose();
         dispose();
@@ -84,7 +88,7 @@ public class JGL {
      * @param listener  the {@code EventListener} responsible for handling the specified event type
      * @throws NullPointerException if {@code eventType} or {@code listener} is null
      */
-    public static <T extends Event> void registerEventListener(Class<T> eventType, EventListener<T> listener) {
+    public static <T extends Event> void subscribe(Class<T> eventType, EventListener<T> listener) {
         if (eventType == null)
             throw new NullPointerException("A null event type cannot be registered for event listeners.");
         if (listener == null)
@@ -154,6 +158,7 @@ public class JGL {
         Keyboard.dispose();
         Mouse.dispose();
         Window.dispose();
+        Audio.dispose();
 
         glfwTerminate();
     }

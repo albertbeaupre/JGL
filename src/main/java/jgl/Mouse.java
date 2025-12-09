@@ -123,10 +123,10 @@ public final class Mouse {
 
 
         scrollCallback = glfwSetScrollCallback(Window.getAddress(), (win, xoff, yoff) -> {
-            JGL.publish(new MouseScrollEvent((int) xoff, (int) yoff));
-
             scrollX = (byte) xoff;
             scrollY = (byte) yoff;
+
+            JGL.publish(new MouseScrollEvent(scrollX, scrollY));
         });
     }
 
@@ -155,15 +155,39 @@ public final class Mouse {
      * @return the cursor's y position
      */
     public static short getY() {
-        return y;
+        return (short) (Window.getHeight() - y);
     }
 
+    /**
+     * Retrieves the current horizontal scroll value captured by the mouse's scroll wheel.
+     * The value is typically used to represent horizontal scrolling activity detected
+     * by the mouse.
+     *
+     * @return the horizontal scroll value as a byte
+     */
     public static byte getScrollX() {
         return scrollX;
     }
 
+    /**
+     * Retrieves the current vertical scroll value captured by the mouse's scroll wheel.
+     * The value is typically used to represent vertical scrolling activity detected
+     * by the mouse.
+     *
+     * @return the vertical scroll value as a byte
+     */
     public static byte getScrollY() {
         return scrollY;
+    }
+
+    /**
+     * Resets the mouse scroll values to their default states. This method sets
+     * both the horizontal and vertical scroll values to zero. It is typically
+     * used to clear any accumulated scroll buffer to prepare for new scroll input.
+     */
+    static void resetScroll() {
+        scrollX = 0;
+        scrollY = 0;
     }
 
     /**

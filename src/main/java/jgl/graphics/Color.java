@@ -1,12 +1,14 @@
-package jgl.math.geometry;
+package jgl.graphics;
 
 /**
  * Represents a color in RGBA format. Colors are immutable and stored internally as 32-bit integers
  * in the format 0xAARRGGBB where AA=alpha, RR=red, GG=green, BB=blue.
+ *
+ * @author Albert Beaupre
+ * @since November 3rd, 2025
  */
 public class Color {
 
-    // ===== Base Colors =====
     /**
      * Pure white color (0xFFFFFFFF)
      */
@@ -84,7 +86,6 @@ public class Color {
      */
     public static final Color GOLD = new Color(0xFFFFD700);
 
-    // ===== Reds & Variants =====
     /**
      * Crimson red color (0xFFDC143C)
      */
@@ -114,7 +115,6 @@ public class Color {
      */
     public static final Color TOMATO = new Color(0xFFFF6347);
 
-    // ===== Oranges =====
     /**
      * Coral orange color (0xFFFF7F50)
      */
@@ -132,7 +132,6 @@ public class Color {
      */
     public static final Color TAN = new Color(0xFFD2B48C);
 
-    // ===== Yellows =====
     /**
      * Khaki yellow color (0xFFF0E68C)
      */
@@ -154,7 +153,6 @@ public class Color {
      */
     public static final Color LIGHT_YELLOW = new Color(0xFFFFFFE0);
 
-    // ===== Greens =====
     /**
      * Dark green color (0xFF006400)
      */
@@ -188,7 +186,6 @@ public class Color {
      */
     public static final Color HONEYDEW = new Color(0xFFF0FFF0);
 
-    // ===== Blues =====
     /**
      * Sky blue color (0xFF87CEEB)
      */
@@ -218,7 +215,6 @@ public class Color {
      */
     public static final Color DODGER_BLUE = new Color(0xFF1E90FF);
 
-    // ===== Purples & Pinks =====
     /**
      * Plum purple color (0xFFDDA0DD)
      */
@@ -248,7 +244,6 @@ public class Color {
      */
     public static final Color DEEP_PINK = new Color(0xFFFF1493);
 
-    // ===== Earth Tones =====
     /**
      * Saddle brown color (0xFF8B4513)
      */
@@ -274,7 +269,6 @@ public class Color {
      */
     public static final Color MOCCASIN = new Color(0xFFFFE4B5);
 
-    // ===== Cool Tints =====
     /**
      * Aquamarine color (0xFF7FFFD4)
      */
@@ -296,7 +290,6 @@ public class Color {
      */
     public static final Color TEAL_BLUE = new Color(0xFF367588);
 
-    // ===== Warm Pinks/Peach =====
     /**
      * Peach puff color (0xFFFFDAB9)
      */
@@ -322,7 +315,6 @@ public class Color {
      */
     public static final Color BLUSH = new Color(0xFFDE5D83);
 
-    // ===== Browns & Naturals =====
     /**
      * Dark goldenrod color (0xFFB8860B)
      */
@@ -352,7 +344,6 @@ public class Color {
      */
     public static final Color PAPAYA_WHIP = new Color(0xFFFFEFD5);
 
-    // ===== Pale Variants =====
     /**
      * Pale green color (0xFF98FB98)
      */
@@ -374,7 +365,6 @@ public class Color {
      */
     public static final Color PALE_PINK = new Color(0xFFFFCCFF);
 
-    // ===== Grays Extended =====
     /**
      * Silver color (0xFFC0C0C0)
      */
@@ -404,7 +394,6 @@ public class Color {
      */
     public static final Color JET = new Color(0xFF343434);
 
-    // ===== Atmospheric / Sky =====
     /**
      * Alice blue color (0xFFF0F8FF)
      */
@@ -434,7 +423,6 @@ public class Color {
      */
     public static final Color CLOUD_WHITE = new Color(0xFFF7F7FF);
 
-    // ===== "Fun" Colors =====
     /**
      * Electric lime color (0xFFCCFF00)
      */
@@ -456,7 +444,6 @@ public class Color {
      */
     public static final Color NEON_PURPLE = new Color(0xFFBC13FE);
 
-    // ===== Earth Greens =====
     /**
      * Fern green color (0xFF4F7942)
      */
@@ -478,7 +465,6 @@ public class Color {
      */
     public static final Color BASIL = new Color(0xFF568203);
 
-    // ===== UI-Friendly Utility =====
     /**
      * Fully transparent color (0x00000000)
      */
@@ -549,4 +535,44 @@ public class Color {
     public int getAlpha() {
         return (rgba >> 24) & 0xFF;
     }
+
+    /**
+     * Calculates the alpha component of this color as a normalized float value in the range [0.0, 1.0].
+     *
+     * @return The normalized alpha value
+     */
+    public float getA() {
+        return getAlpha() / 255.0f;
+    }
+
+    /**
+     * Calculates the red component of this color as a normalized float value
+     * in the range [0.0, 1.0].
+     *
+     * @return The normalized red value
+     */
+    public float getR() {
+        return getRed() / 255.0f;
+    }
+
+    /**
+     * Calculates the green component of this color as a normalized float value
+     * in the range [0.0, 1.0].
+     *
+     * @return The normalized green value
+     */
+    public float getG() {
+        return getGreen() / 255.0f;
+    }
+
+    /**
+     * Calculates the blue component of this color as a normalized float value
+     * in the range [0.0, 1.0].
+     *
+     * @return The normalized blue value
+     */
+    public float getB() {
+        return getBlue() / 255.0f;
+    }
+
 }

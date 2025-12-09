@@ -1,32 +1,58 @@
 import jgl.Application;
 import jgl.JGL;
 import jgl.Window;
-import jgl.graphics.Texture;
-import jgl.graphics.TextureData;
-import jgl.graphics.TextureFilter;
+import jgl.graphics.texture.Texture;
+import jgl.graphics.texture.TextureData;
+import jgl.graphics.texture.TextureFilter;
 import jgl.viewport.ScreenViewport;
 
 public class TextureTest implements Application {
 
-    private Texture texture;
+    private Texture rotating, scaling, flipping, region;
     private ScreenViewport viewport;
 
     private float time = 0f;
 
     @Override
     public void init() {
-        viewport = new ScreenViewport(Window.getWidth(), Window.getHeight());
+        int width = Window.getWidth();
+        int height = Window.getHeight();
+        viewport = new ScreenViewport(width, height);
 
         // Load texture ONCE
-        TextureData texData = TextureData.loadTexture("./src/test/resources/pixel-art.png");
-        texture = new Texture(texData);
+        TextureData data = TextureData.load("./src/test/resources/pixel-art.png");
+        region = new Texture(data);
+        rotating = new Texture(data);
+        scaling = new Texture(data);
+        flipping = new Texture(data);
 
-        ///texture.setFilter(TextureFilter.LINEAR);
-        texture.setFilter(TextureFilter.NEAREST); // try this too for pixel-art look
+        region.setFilter(TextureFilter.NEAREST);
+        region.setRegion(128, 128, 256, 256);
+        region.setSize(width / 2f, height / 2f);
+        rotating.setSize(width / 2f, height / 2f);
+        scaling.setSize(width / 2f, height / 2f);
+        flipping.setSize(width / 2f, height / 2f);
 
-        texture.setFlip(false, false);
-        texture.setScale(1f, 1f); // normal size
-        texture.setOriginCenter();
+        region.setPosition(0, 0);
+        rotating.setPosition(width / 2f, 0);
+        scaling.setPosition(width / 2f, height / 2f);
+        flipping.setPosition(0, height / 2f);
+
+        rotating.setOriginCenter();
+
+        Window.addWindowResizeListener(event -> {
+            int w = event.getNewWidth();
+            int h = event.getNewHeight();
+            region.setSize(w / 2f, h / 2f);
+            rotating.setSize(w / 2f, h / 2f);
+            scaling.setSize(w / 2f, h / 2f);
+            flipping.setSize(w / 2f, h / 2f);
+
+            region.setPosition(0, 0);
+            rotating.setPosition(w / 2f, 0);
+            scaling.setPosition(w / 2f, h / 2f);
+            flipping.setPosition(0, h / 2f);
+        });
     }
 
     @Override
@@ -37,22 +63,20 @@ public class TextureTest implements Application {
 
         // Animate scale to verify scaleX/scaleY work
         float s = 1f + (float) Math.sin(time) * 0.5f; // range 0.5 → 1.5
-        texture.setScale(s, s);
+        scaling.setScale(s, s);
         // Toggle flipping every 2 seconds to test flip logic
-        texture.setFlipX((int) (time * 0.5f) % 2 == 0);
-        texture.setFlipY((int) (time * 0.25f) % 2 == 0);
-        texture.setRotation(texture.getRotation() + delta * 100f);
+        flipping.setFlipX((int) (time * 0.5f) % 2 == 0);
+        flipping.setFlipY((int) (time * 0.25f) % 2 == 0);
+        rotating.setRotation(rotating.getRotation() + delta * 100f);
     }
 
     @Override
     public void render() {
         viewport.render(() -> {
-
-            float w = texture.getWidth() * texture.getScaleX();
-            float h = texture.getHeight() * texture.getScaleY();
-            texture.setPosition(Window.getWidth() / 2f - w / 2f, Window.getHeight() / 2f - h / 2f);
-
-            texture.draw();
+            region.draw();
+            scaling.draw();
+            flipping.draw();
+            rotating.draw();
         });
     }
 

@@ -69,7 +69,7 @@ void main() {
     } else if (shapeType == 0.0) { // Line: anchor = start point
         world = instanceLocation + rotated + instanceOffset;
     } else if (shapeType == 2.0) { // Circle: anchor = center
-        world = instanceLocation + rotated + instanceOffset;
+        world = instanceLocation + rotated + halfSize + instanceOffset;
     } else {
         world = instanceLocation + rotated + halfSize + instanceOffset;
     }
@@ -80,7 +80,6 @@ void main() {
         finalPos = u_projection * vec4(world, 0.0, 1.0);
     } else {
         vec2 ndc = (world / u_resolution) * 2.0 - 1.0;
-        ndc.y = -ndc.y;
         finalPos = vec4(ndc, 0.0, 1.0);
     }
 

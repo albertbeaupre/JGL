@@ -1,6 +1,7 @@
 package jgl.math.geometry;
 
 import jgl.Window;
+import jgl.graphics.Color;
 import jgl.viewport.Viewport;
 
 import static org.lwjgl.opengl.GL20.*;
@@ -12,21 +13,14 @@ import static org.lwjgl.opengl.GL33.glVertexAttribDivisor;
 /**
  * The ShapeRenderer class is responsible for managing and rendering a collection
  * of shapes using OpenGL instanced drawing. This renderer is optimized for handling
- * dynamic per-instance data, reusing buffers to minimize overhead during rendering.
+ * dynamic per-instance buffer, reusing buffers to minimize overhead during rendering.
  *
  * @author Albert Beaupre
  * @since November 11th, 2025
  */
 public class ShapeRenderer {
 
-    private static final float[] SCREEN_QUAD = {
-            -1f, -1f,
-            1f, -1f,
-            1f,  1f,
-            -1f, -1f,
-            1f,  1f,
-            -1f,  1f
-    };
+    private static final float[] SCREEN_QUAD = {-1f, -1f, 1f, -1f, 1f, 1f, -1f, -1f, 1f, 1f, -1f, 1f};
 
     // Per-instance layout:
     //  0: x
@@ -71,7 +65,7 @@ public class ShapeRenderer {
         // Quad
         int quadVbo = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, quadVbo);
-        glBufferData(GL_ARRAY_BUFFER, SCREEN_QUAD, org.lwjgl.opengl.GL15.GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, SCREEN_QUAD, GL_STATIC_DRAW);
         glVertexAttribPointer(0, 2, GL_FLOAT, false, 2 * Float.BYTES, 0);
         glEnableVertexAttribArray(0);
 
@@ -125,8 +119,7 @@ public class ShapeRenderer {
      * are resized.
      */
     private void ensureCapacity() {
-        if (size < shapes.length)
-            return;
+        if (size < shapes.length) return;
 
         int newCount = shapes.length * 2;
         Shape[] ns = new Shape[newCount];
@@ -161,7 +154,7 @@ public class ShapeRenderer {
 
     /**
      * Removes a shape from this renderer. The last shape in the array is moved
-     * into the removed slot to keep the instance data contiguous.
+     * into the removed slot to keep the instance buffer contiguous.
      *
      * @param s the shape to remove
      */
@@ -217,7 +210,7 @@ public class ShapeRenderer {
     }
 
     /**
-     * Updates the per-instance data for a single shape in the backing float array.
+     * Updates the per-instance buffer for a single shape in the backing float array.
      *
      * @param shape the shape to update
      */
@@ -226,12 +219,11 @@ public class ShapeRenderer {
 
         Color fill = shape.getColor();
         Border border = shape.getBorder();
-        if (border == null)
-            border = new Border(Color.TRANSPARENT, 0);
+        if (border == null) border = new Border(Color.TRANSPARENT, 0);
 
         Color stroke = border.getColor();
 
-        // Base instance data
+        // Base instance buffer
         buffer[pointer++] = shape.getX();
         buffer[pointer++] = shape.getY();
         buffer[pointer++] = shape.getWidth() * 0.5f;
@@ -266,7 +258,7 @@ public class ShapeRenderer {
                 buffer[pointer++] = line.getX2() - line.getX();
                 buffer[pointer++] = line.getY2() - line.getY();
                 buffer[pointer++] = line.getThickness();
-                buffer[pointer]   = 0.0f; // unused padding to fill vec4
+                buffer[pointer] = 0.0f; // unused padding to fill vec4
             }
 
             case Rectangle -> {
@@ -274,7 +266,7 @@ public class ShapeRenderer {
                 buffer[pointer++] = r.getBottomRightRadius();
                 buffer[pointer++] = r.getTopRightRadius();
                 buffer[pointer++] = r.getBottomLeftRadius();
-                buffer[pointer]   = r.getTopLeftRadius();
+                buffer[pointer] = r.getTopLeftRadius();
             }
 
             case Circle -> {
@@ -308,7 +300,7 @@ public class ShapeRenderer {
                 buffer[pointer++] = vx2;
                 buffer[pointer++] = vy2;
                 buffer[pointer++] = vx3;
-                buffer[pointer]   = vy3;
+                buffer[pointer] = vy3;
             }
         }
 

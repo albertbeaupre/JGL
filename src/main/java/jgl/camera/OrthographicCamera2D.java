@@ -55,6 +55,6 @@ public class OrthographicCamera2D extends Camera2D {
         float top    = center.y + halfH;
 
         // Construct a classic orthographic projection
-        projection.identity().ortho(left, right, bottom, top, -1f, 1f);
+        projection.ortho(left, right, bottom, top, -1f, 1f);
     }
 }

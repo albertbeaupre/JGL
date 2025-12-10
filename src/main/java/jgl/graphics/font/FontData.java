@@ -13,10 +13,20 @@ import java.nio.file.Path;
 
 import static org.lwjgl.stb.STBTruetype.*;
 
+
 /**
- * Immutable CPU-side font description.
- * Contains glyph metrics, atlas pixels, and layout info.
- * No OpenGL context or GPU resources.
+ * Represents font data generated from a TrueType font. This data includes a bitmap atlas, character metrics,
+ * and additional metadata for rendering text.
+ * <p>
+ * The class is immutable and uses the following fields:
+ * - A bitmap representing the font atlas.
+ * - Character data for individual glyphs.
+ * - Atlas pixel data and size.
+ * - Details regarding the first and total number of characters rendered.
+ * - Font metrics such as ascent, descent, scaling factor, and baseline offset.
+ *
+ * @author Albert Beaupre
+ * @since December 6th, 2025
  */
 public record FontData(ByteBuffer bitmap, STBTTPackedchar[] charData, byte[] atlasPixels, int atlasSize, int firstChar,
                        int numChars, float ascent, float descent, float scale, float baseline) {

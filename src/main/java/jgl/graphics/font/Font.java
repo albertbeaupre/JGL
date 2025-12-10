@@ -11,6 +11,18 @@ import java.nio.ByteBuffer;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
 
+/**
+ * Represents a font and its associated rendering capabilities,
+ * utilizing OpenGL for managing texture data and rendering text
+ * onto the GPU.
+ * <p>
+ * The Font class provides methods for rendering text via a
+ * pre-generated glyph atlas and supports efficient text bitmap
+ * updates and OpenGL texture uploads.
+ *
+ * @author Albert Beaupre
+ * @since December 6th, 2025
+ */
 public class Font {
 
     /**
@@ -29,6 +41,16 @@ public class Font {
     private float width;
     private float height;
 
+    /**
+     * Constructs a Font instance using the provided font data.
+     * <p>
+     * Populates a texture with the glyph atlas from the font data and prepares it
+     * for rendering text. Initializes GPU resources and configures texture
+     * parameters.
+     *
+     * @param data the {@link FontData} containing font metrics, glyph atlas,
+     *             and layout information used to initialize this Font.
+     */
     public Font(FontData data) {
         this.data = data;
 

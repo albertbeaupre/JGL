@@ -22,7 +22,6 @@ public class JGL {
     private static float deltaTime;
     private static short framesPerSecond;
 
-
     /**
      * Initializes the OpenGL-based application and sets up the main application loop.
      * This method initializes GLFW, creates the application window, manages input devices,

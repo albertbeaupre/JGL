@@ -37,10 +37,6 @@ import java.nio.file.Path;
  */
 public record TextureData(ByteBuffer buffer, short width, short height) {
 
-    private static final int[] w = new int[1];
-    private static final int[] h = new int[1];
-    private static final int[] comp = new int[1];
-
     /**
      * Loads a texture from a file path. This is a convenience wrapper around
      * {@link #load(byte[])} which retrieves the raw file bytes first.

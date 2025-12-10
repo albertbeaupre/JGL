@@ -18,25 +18,62 @@ This README covers the entire project: windowing, lifecycle, input, events, audi
 - With heavy engines: you get features you don’t need, constrained lifecycles, and opaque abstractions that fight low‑level control.
 - With JGL: you skip the ceremony, keep the metal. Use our lifecycle, input, events, and audio — and dip straight into GLFW/OpenGL anytime.
 
-Show, don’t tell — 35 lines to a real app:
+Show, don’t tell — audio + texture + font in one tiny app:
 ```java
-import jgl.*;
-import jgl.event.events.KeyPressEvent;
-import jgl.sound.SoundPlayer;
+import jgl.*;                                // lifecycle, input, timing
+import jgl.event.events.KeyPressEvent;       // event example
+import jgl.sound.SoundPlayer;                // audio
+import jgl.graphics.texture.Texture;         // texture sprite
+import jgl.graphics.font.Font;               // bitmap font renderer
+import jgl.graphics.font.FontData;           // font atlas data
 
 public class Demo implements Application {
     private SoundPlayer music;
+    private Texture logo;
+    private Font uiText;
+
     @Override public void init() {
         Window.setTitle("JGL Demo");
+
+        // Hotkey example: Ctrl+S → change title
         JGL.subscribe(KeyPressEvent.class, e -> {
-            if (e.isCtrlDown() && (e.getChar() == 's' || e.getChar() == 'S')) Window.setTitle("Saved!");
+            if (e.isCtrlDown() && (e.getChar() == 's' || e.getChar() == 'S'))
+                Window.setTitle("Saved!");
         });
+
+        // Audio: load and loop a short track
         music = Audio.load("assets/loop.ogg");
-        music.setLooping(true); music.play();
+        music.setLooping(true);
+        music.play();
+
+        // Texture: load a sprite and place it
+        logo = new Texture("assets/logo.png");
+        logo.setPosition(32, 32);
+
+        // Font: build atlas and render text
+        FontData data = FontData.load("assets/Roboto-Regular.ttf", 24, 32, 96);
+        uiText = new Font(data);
+        uiText.setText("Hello, JGL! Press ESC to show FPS");
+        uiText.setPosition(32, 128);
     }
-    @Override public void update(float dt) { if (Keyboard.isKeyDown(256)) Window.setTitle("ESC – FPS=" + JGL.getFramesPerSecond()); }
-    @Override public void render() { /* your OpenGL draw calls here */ }
-    @Override public void dispose() { if (music != null) music.dispose(); }
+
+    @Override public void update(float dt) {
+        // Simple input + timing: show FPS when ESC (GLFW 256) is held
+        if (Keyboard.isKeyDown(256))
+            Window.setTitle("ESC – FPS=" + JGL.getFramesPerSecond());
+    }
+
+    @Override public void render() {
+        logo.draw();
+        uiText.draw();
+    }
+
+    @Override public void dispose() {
+        if (music != null) music.dispose();
+        if (logo != null) logo.dispose();
+        if (uiText != null) uiText.dispose();
+    }
+
     public static void main(String[] a){ JGL.init(new Demo(), "JGL", 1280, 720); }
 }
 ```
@@ -56,78 +93,9 @@ public class Demo implements Application {
 
 ## Getting Started
 
-### 1) Create an Application
+You already saw a minimal, working example above. Use that as your starting point.
 
-Implement the `jgl.Application` interface which defines the game loop lifecycle. The example below shows how to: set the window title, read keyboard/mouse input, subscribe to a window resize event, query timing, and play looping music.
-
-```java
-import jgl.Application;
-import jgl.JGL;
-import jgl.Window;
-import jgl.Keyboard;
-import jgl.Mouse;
-import jgl.Audio;
-import jgl.event.EventListener;
-import jgl.event.events.WindowResizeEvent;
-import jgl.sound.SoundPlayer;
-
-public class MyGame implements Application {
-    private SoundPlayer music;
-
-    @Override
-    public void init() {
-        // Window setup
-        Window.setTitle("My Game — Initializing...");
-
-        // Subscribe to events (updates title on resize)
-        JGL.subscribe(WindowResizeEvent.class, e -> {
-            Window.setTitle("Resized to " + e.getNewWidth() + "x" + e.getNewHeight());
-        });
-
-        // Load and start background music (wav/ogg/mp3)
-        music = Audio.load("assets/music.ogg");
-        music.setLooping(true);
-        music.setVolume(0.5f);
-        music.play();
-    }
-
-    @Override
-    public void update(float delta) {
-        // Keyboard example: ESC (GLFW_KEY_ESCAPE = 256). Replace with your key constants.
-        if (Keyboard.isKeyDown(256)) {
-            Window.setTitle("ESC pressed — FPS=" + JGL.getFramesPerSecond());
-        }
-
-        // Mouse examples
-        short mx = Mouse.getX();
-        short my = Mouse.getY();
-        int scrollX = Mouse.getScrollX();
-        int scrollY = Mouse.getScrollY();
-        // Use mx, my, scrollX, scrollY as needed
-
-    }
-
-    @Override
-    public void render() {
-        // Issue OpenGL draw calls here
-        // You can also query FPS for debug overlays
-        short fps = JGL.getFramesPerSecond();
-        // drawText("FPS: " + fps, ...);
-    }
-
-    @Override
-    public void dispose() {
-        if (music != null) music.dispose();
-    }
-
-    public static void main(String[] args) {
-        // Boot the app. Creates window/context and runs the loop.
-        JGL.init(new MyGame(), "My Game", 1280, 720);
-    }
-}
-```
-
-### 2) Run
+### Run
 
 - Using Gradle wrapper: `./gradlew run` (Linux/Mac) or `gradlew.bat run` (Windows)
 - Or run your `main` class directly from your IDE

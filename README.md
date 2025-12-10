@@ -2,7 +2,7 @@
 
 Stop wiring GLFW every time. JGL is the smallest useful layer on top of LWJGL 3 that gets you from “empty desktop” to a running OpenGL window with input, timing, events, and audio — in one line — while keeping full access to raw LWJGL whenever you want it.
 
-Why is JGL awesome (vs. “just LWJGL” or a heavy engine)?
+Why is JGL awesome
 - Start instantly: `JGL.init(app, title, w, h)` creates the window/context, boots input (keyboard/mouse), time/FPS, and OpenAL audio — no boilerplate wall
 - Stay in control: explicit lifecycle (`init`, `update(delta)`, `render`, `dispose`) that fits any architecture and doesn’t hide LWJGL/OpenGL
 - Code that scales: a typed, priority‑ordered event bus with listener filtering for clean cross‑cutting behavior

@@ -1,17 +1,52 @@
 # JGL — Java Game Library
 
-JGL is a lightweight, modular game library for Java built on LWJGL 3. It provides a clean, minimal API to bootstrap a windowed OpenGL application, manage input, play audio via OpenAL, publish/subscribe events, and more. Use it as a foundation for simple games, prototypes, tools, and demos.
+Stop wiring GLFW every time. JGL is the smallest useful layer on top of LWJGL 3 that gets you from “empty desktop” to a running OpenGL window with input, timing, events, and audio — in one line — while keeping full access to raw LWJGL whenever you want it.
+
+Why is JGL awesome (vs. “just LWJGL” or a heavy engine)?
+- Start instantly: `JGL.init(app, title, w, h)` creates the window/context, boots input (keyboard/mouse), time/FPS, and OpenAL audio — no boilerplate wall
+- Stay in control: explicit lifecycle (`init`, `update(delta)`, `render`, `dispose`) that fits any architecture and doesn’t hide LWJGL/OpenGL
+- Code that scales: a typed, priority‑ordered event bus with listener filtering for clean cross‑cutting behavior
+- Input that feels right: simple, stateful queries (`Keyboard.isKeyDown`, `Mouse.getX/Y`, scroll, modifiers, key→char)
+- Audio without yak‑shaving: `Audio.load("file.ext")` → `SoundPlayer.play()` with loop/volume/pause/seek (wav/ogg/mp3)
+- Tiny and transparent: import only what you need, call GLFW/OpenGL directly inside your loop — zero lock‑in
 
 This README covers the entire project: windowing, lifecycle, input, events, audio, and a quick overview of additional packages.
 
-## Highlights
+## Why JGL (the short version)
 
-- Window and context management (GLFW + OpenGL)
-- App lifecycle with `Application` interface (`init`, `update`, `render`, `dispose`)
-- Input handling: keyboard and mouse helpers
-- Event bus with priority-ordered listeners (publish/subscribe)
-- Audio playback built on OpenAL (via LWJGL) with simple `Audio.load` + `SoundPlayer`
-- Utility packages for graphics, math, IO, textures, shaders, fonts, and more (see Package Overview)
+- Without JGL (raw LWJGL): you hand‑roll the window, context, callbacks, input state, timing/FPS, audio device/context, and cleanup every project.
+- With heavy engines: you get features you don’t need, constrained lifecycles, and opaque abstractions that fight low‑level control.
+- With JGL: you skip the ceremony, keep the metal. Use our lifecycle, input, events, and audio — and dip straight into GLFW/OpenGL anytime.
+
+Show, don’t tell — 35 lines to a real app:
+```java
+import jgl.*;
+import jgl.event.events.KeyPressEvent;
+import jgl.sound.SoundPlayer;
+
+public class Demo implements Application {
+    private SoundPlayer music;
+    @Override public void init() {
+        Window.setTitle("JGL Demo");
+        JGL.subscribe(KeyPressEvent.class, e -> {
+            if (e.isCtrlDown() && (e.getChar() == 's' || e.getChar() == 'S')) Window.setTitle("Saved!");
+        });
+        music = Audio.load("assets/loop.ogg");
+        music.setLooping(true); music.play();
+    }
+    @Override public void update(float dt) { if (Keyboard.isKeyDown(256)) Window.setTitle("ESC – FPS=" + JGL.getFramesPerSecond()); }
+    @Override public void render() { /* your OpenGL draw calls here */ }
+    @Override public void dispose() { if (music != null) music.dispose(); }
+    public static void main(String[] a){ JGL.init(new Demo(), "JGL", 1280, 720); }
+}
+```
+
+## Why it’s better in practice
+
+- Less glue code, fewer bugs: Lifecycle + input + timing + audio are solved once and battle‑tested; you focus on your game loop.
+- Events that stay readable: Subscribe per type, optional `canHandle` filtering, and priority ordering via annotations.
+- Direct metal access: Nothing stops you from calling GLFW/OpenGL/NanoVG directly where it makes sense.
+- Predictable performance: event dispatch calls listeners directly (no reflection per publish); input state is polled once per frame; timing and FPS come ready‑made.
 
 ## Requirements
 

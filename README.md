@@ -1,0 +1,212 @@
+# JGL — Java Game Library
+
+JGL is a lightweight, modular game library for Java built on LWJGL 3. It provides a clean, minimal API to bootstrap a windowed OpenGL application, manage input, play audio via OpenAL, publish/subscribe events, and more. Use it as a foundation for simple games, prototypes, tools, and demos.
+
+This README covers the entire project: windowing, lifecycle, input, events, audio, and a quick overview of additional packages.
+
+## Highlights
+
+- Window and context management (GLFW + OpenGL)
+- App lifecycle with `Application` interface (`init`, `update`, `render`, `dispose`)
+- Input handling: keyboard and mouse helpers
+- Event bus with priority-ordered listeners (publish/subscribe)
+- Audio playback built on OpenAL (via LWJGL) with simple `Audio.load` + `SoundPlayer`
+- Utility packages for graphics, math, IO, textures, shaders, fonts, and more (see Package Overview)
+
+## Requirements
+
+- Java 23 (toolchain configured in `build.gradle`)
+- Gradle (wrapper included) or Maven
+- LWJGL 3.x (GLFW, OpenGL, STB, NanoVG, OpenAL; managed via BOM)
+
+## Getting Started
+
+### 1) Create an Application
+
+Implement the `jgl.Application` interface which defines the game loop lifecycle. The example below shows how to: set the window title, read keyboard/mouse input, subscribe to a window resize event, query timing, and play looping music.
+
+```java
+import jgl.Application;
+import jgl.JGL;
+import jgl.Window;
+import jgl.Keyboard;
+import jgl.Mouse;
+import jgl.Audio;
+import jgl.event.EventListener;
+import jgl.event.events.WindowResizeEvent;
+import jgl.sound.SoundPlayer;
+
+public class MyGame implements Application {
+    private SoundPlayer music;
+
+    @Override
+    public void init() {
+        // Window setup
+        Window.setTitle("My Game — Initializing...");
+
+        // Subscribe to events (updates title on resize)
+        JGL.subscribe(WindowResizeEvent.class, e -> {
+            Window.setTitle("Resized to " + e.getNewWidth() + "x" + e.getNewHeight());
+        });
+
+        // Load and start background music (wav/ogg/mp3)
+        music = Audio.load("assets/music.ogg");
+        music.setLooping(true);
+        music.setVolume(0.5f);
+        music.play();
+    }
+
+    @Override
+    public void update(float delta) {
+        // Keyboard example: ESC (GLFW_KEY_ESCAPE = 256). Replace with your key constants.
+        if (Keyboard.isKeyDown(256)) {
+            Window.setTitle("ESC pressed — FPS=" + JGL.getFramesPerSecond());
+        }
+
+        // Mouse examples
+        short mx = Mouse.getX();
+        short my = Mouse.getY();
+        int scrollX = Mouse.getScrollX();
+        int scrollY = Mouse.getScrollY();
+        // Use mx, my, scrollX, scrollY as needed
+
+    }
+
+    @Override
+    public void render() {
+        // Issue OpenGL draw calls here
+        // You can also query FPS for debug overlays
+        short fps = JGL.getFramesPerSecond();
+        // drawText("FPS: " + fps, ...);
+    }
+
+    @Override
+    public void dispose() {
+        if (music != null) music.dispose();
+    }
+
+    public static void main(String[] args) {
+        // Boot the app. Creates window/context and runs the loop.
+        JGL.init(new MyGame(), "My Game", 1280, 720);
+    }
+}
+```
+
+### 2) Run
+
+- Using Gradle wrapper: `./gradlew run` (Linux/Mac) or `gradlew.bat run` (Windows)
+- Or run your `main` class directly from your IDE
+
+## Core Concepts and APIs
+
+### Lifecycle: `JGL` and `Application`
+
+- Implement `Application` with: `void init()`, `void update(float delta)`, `void render()`, `void dispose()`
+- Start your app with `JGL.init(application, title, width, height)`
+- Query timing: `JGL.getDeltaTime()`, `JGL.getFramesPerSecond()`
+
+### Window: `Window`
+
+- Create and manage the window/context automatically via `JGL.init(...)`
+- Control window state:
+  - `Window.setTitle(String)`
+  - `Window.setSize(int width, int height)`
+  - `Window.setFullscreen(boolean)`
+  - `Window.setSwapInterval(SwapInterval)` and `Window.getSwapInterval()`
+  - Query dimensions/position: `getWidth()`, `getHeight()`, `getX()`, `getY()`, `getFramebufferSize()`
+
+### Input: `Keyboard` and `Mouse`
+
+- Keyboard:
+  - `Keyboard.isKeyDown(int key)`
+  - Modifiers: `isShiftDown()`, `isCtrlDown()`, `isAltDown()`, `isSuperDown()`
+  - `Keyboard.getKeyChar(int key)` for character mapping
+- Mouse:
+  - Position: `Mouse.getX()`, `Mouse.getY()`
+  - Buttons: `Mouse.isButtonDown(int button)`
+  - Scroll: `Mouse.getScrollX()`, `Mouse.getScrollY()`, and `Mouse.resetScroll()` per frame
+
+### Events: Publish/Subscribe
+
+JGL includes a simple event bus:
+
+- Subscribe: `JGL.subscribe(EventType.class, listener)`
+- Publish: `JGL.publish(event)`
+- Listeners implement `EventListener<E>` and optionally override `canHandle(E)` for filtering
+
+Example: keyboard shortcut (Ctrl+S) with filtering
+
+```java
+import jgl.JGL;
+import jgl.Window;
+import jgl.event.EventListener;
+import jgl.event.events.KeyPressEvent;
+
+public final class SaveShortcutExample {
+    public static void register() {
+        // Listen for Ctrl+S using canHandle filtering
+        JGL.subscribe(KeyPressEvent.class, new EventListener<KeyPressEvent>() {
+            @Override public boolean canHandle(KeyPressEvent e) {
+                char c = e.getChar();
+                return e.isCtrlDown() && (c == 's' || c == 'S');
+            }
+
+            @Override public void handle(KeyPressEvent e) {
+                Window.setTitle("Save triggered (Ctrl+" + Character.toUpperCase(e.getChar()) + ")");
+                // performSave(); // your save logic here
+            }
+        });
+    }
+}
+```
+
+You can also create strongly-typed listener interfaces such as `jgl.event.listeners.WindowResizeListener`.
+
+### Audio: `Audio` and `SoundPlayer`
+
+- JGL initializes OpenAL internally during `JGL.init(...)`
+- Load sounds:
+  - `SoundPlayer s = Audio.load("file.ext")` (wav/ogg/mp3 supported)
+  - `SoundPlayer s = Audio.load(byte[])`
+- Control playback via `SoundPlayer`:
+  - `play()`, `pause()`, `resume()`, `stop()`, `rewind()`
+  - `setLooping(boolean)`, `setVolume(float)`, `setPitch(float)`
+  - Query `isPlaying()`, `isPaused()`, `isStopped()`, `duration()`, `getCurrentTime()`
+  - Seek with `setCurrentTime(float seconds)`
+  - Always call `dispose()` when done
+
+## Package Overview
+
+The project is organized into modules under `src/main/java/jgl`:
+
+- `jgl` — Core (`JGL`, `Application`, `Window`, `Audio`, `Keyboard`, `Mouse`)
+- `jgl.event` — Event system (publisher, listener, priorities, events like `WindowResizeEvent`)
+- `jgl.sound` — Decoders and playback (`SoundPlayer`, `SoundData`, `WaveDecoder`, `OggDecoder`, `Mp3Decoder`)
+- `jgl.graphics` — Graphics helpers (shaders, textures, fonts, etc.)
+- `jgl.math` — Math and geometry utilities
+- `jgl.io` — I/O helpers and pools
+- `jgl.collections` — Arrays, stacks, queues, trees, bitsets
+- `jgl.viewport`, `jgl.camera`, `jgl.ui`, `jgl.utility`, `jgl.plugin`, and more
+
+Note: Some packages provide building blocks and utilities intended to be used directly or extended within your app; explore the source for further details.
+
+## Building and Running This Project
+
+This repository includes a Gradle build.
+
+- Build: `./gradlew build`
+- Run: `./gradlew run`
+
+## Tips & Notes
+
+- Ensure native LWJGL binaries match your OS (`natives-windows`, `natives-linux`, or `natives-macos`)
+- Manage assets (audio/images/shaders) on the runtime classpath or via absolute/relative paths accessible at runtime
+- Always dispose resources you create (`SoundPlayer.dispose()`, any GL objects you allocate in graphics helpers)
+
+## Next updates...
+
+1. Shaders 
+2. Shape Drawing 
+3. User Interface
+---
+

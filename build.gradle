@@ -1,6 +1,5 @@
 plugins {
     id 'java'
-    id 'application'
 }
 
 group = 'jgl'
@@ -11,10 +10,6 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(23)
     }
-}
-
-application {
-    mainClass = 'com.example.NanoVGExample'
 }
 
 def lwjglNatives = "natives-windows"
@@ -31,7 +26,6 @@ dependencies {
     implementation "org.lwjgl:lwjgl"
     implementation "org.lwjgl:lwjgl-glfw"
     implementation "org.lwjgl:lwjgl-opengl"
-    implementation "org.lwjgl:lwjgl-nanovg"
     implementation "org.lwjgl:lwjgl-stb"
     implementation "org.lwjgl:lwjgl-openal"
     implementation "com.googlecode.soundlibs:mp3spi:1.9.5-1"
@@ -43,14 +37,8 @@ dependencies {
     runtimeOnly "org.lwjgl:lwjgl-nanovg::$lwjglNatives"
     runtimeOnly "org.lwjgl:lwjgl-stb::$lwjglNatives"
     runtimeOnly "org.lwjgl:lwjgl-openal::$lwjglNatives"
-
-    implementation "net.onedaybeard.artemis:artemis-odb:2.3.0"
 }
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
-}
-
-tasks.run {
-    standardInput = System.in
 }

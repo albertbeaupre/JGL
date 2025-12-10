@@ -9,7 +9,6 @@ import java.util.NoSuchElementException;
  * method calls and checks, which in turn is fewer instructions.
  *
  * @author Albert Beaupre
- * @version 1.0
  * @since May 1st, 2024
  */
 public class LongFastStack implements Iterable<Long> {
@@ -42,9 +41,7 @@ public class LongFastStack implements Iterable<Long> {
             // If the array is full, create a new array with double the capacity
             long[] copy = new long[stack.length * 2];
             // Copy the elements from the old array to the new array
-            for (int i = 0; i < stack.length; i++) {
-                copy[i] = stack[i];
-            }
+            System.arraycopy(stack, 0, copy, 0, stack.length);
             // Update the reference to the new array
             stack = copy;
         }

@@ -45,16 +45,20 @@ public class SwapOnRemoveArray<E> {
     }
 
     /**
-     * Removes the element at the specified index from the array. The element is efficiently removed by swapping
-     * it with the last element in the array, and then setting the last element to null.
+     * Removes the element at the specified index from the array. The element to be removed
+     * is swapped with the last element in the array, and the size of the array is decremented.
+     * The removed element is returned.
      *
      * @param index the index of the element to be removed
+     * @return the element that was removed from the array
      */
-    public void remove(int index) {
+    public E remove(int index) {
         // Swap the element to be removed with the last element in the array
+        E object = data[index];
         data[index] = data[--size];
         // Set the last element to null
         data[size] = null;
+        return object;
     }
 
     /**
@@ -64,10 +68,10 @@ public class SwapOnRemoveArray<E> {
      */
     public void removeValue(E value) {
         for (int i = 0; i < size; i++) {
-            if (data[i] == value) {
-                // Copy the remove method so we don't have a method call
+            if (data[i] != null && data[i].equals(value) || data[i] == value) {
                 data[i] = data[--size];
                 data[size] = null;
+                i--; // recheck the swapped element
             }
         }
     }

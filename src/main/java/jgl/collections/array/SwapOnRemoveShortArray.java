@@ -44,16 +44,20 @@ public class SwapOnRemoveShortArray {
     }
 
     /**
-     * Removes the element at the specified index from the array. The element is efficiently removed by swapping
-     * it with the last element in the array, and then setting the last element to 0.
+     * Removes the element at the specified index from the array. The element to be removed
+     * is swapped with the last element in the array, and the size of the array is decremented.
+     * The removed element is returned.
      *
      * @param index the index of the element to be removed
+     * @return the element that was removed from the array
      */
-    public void remove(int index) {
+    public short remove(int index) {
         // Swap the element to be removed with the last element in the array
+        short object = data[index];
         data[index] = data[--size];
-        // Set the last element to 0
+        // Set the last element to null
         data[size] = 0;
+        return object;
     }
 
     /**

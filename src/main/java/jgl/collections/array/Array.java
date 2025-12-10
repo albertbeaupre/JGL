@@ -1,9 +1,7 @@
 package jgl.collections.array;
 
-import java.lang.reflect.Array;
-
 /**
- * ResizingArray is a generic class that represents a dynamic array with automatic resizing capabilities.
+ * Array is a generic class that represents a dynamic array with automatic resizing capabilities.
  * It allows the storage and retrieval of elements at specified indices, automatically resizing the underlying array
  * when necessary to accommodate new elements.
  *
@@ -12,7 +10,7 @@ import java.lang.reflect.Array;
  * @version 1.0
  * @since May 1st, 2024
  */
-public class ResizingArray<T> {
+public class Array<T> {
 
     /**
      * The underlying array to store elements of type T.
@@ -20,22 +18,22 @@ public class ResizingArray<T> {
     private T[] array;
 
     /**
-     * Constructs a ResizingArray with the specified type and initial size.
+     * Constructs a Array with the specified type and initial size.
      *
      * @param size the initial size of the array.
      */
-    public ResizingArray(int size) {
+    public Array(int size) {
         this.array = (T[]) new Object[size];
     }
 
     /**
-     * Constructs a ResizingArray with the specified type and initial size.
+     * Constructs an Array with the specified type and initial size.
      *
      * @param type the class object representing the type of elements to be stored.
      * @param size the initial size of the array.
      */
-    public ResizingArray(Class<T> type, int size) {
-        this.array = (T[]) Array.newInstance(type, size);
+    public Array(Class<T> type, int size) {
+        this.array = (T[]) java.lang.reflect.Array.newInstance(type, size);
     }
 
     /**
@@ -65,14 +63,14 @@ public class ResizingArray<T> {
     }
 
     /**
-     * @return The length of elements within this ResizingArray.
+     * @return The length of elements within this Array.
      */
     public int length() {
         return array.length;
     }
 
     /**
-     * @return The elements within this ResizingArray.
+     * @return The elements within this Array.
      */
     public T[] getElements() {
         return array;

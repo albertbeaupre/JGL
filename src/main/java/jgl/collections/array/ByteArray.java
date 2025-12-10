@@ -1,7 +1,7 @@
 package jgl.collections.array;
 
 /**
- * ResizingByteArray is a class that represents a dynamic array with automatic resizing capabilities for primitive bytes.
+ * ByteArray is a class that represents a dynamic array with automatic resizing capabilities for primitive bytes.
  * It allows the storage and retrieval of elements at specified indices, automatically resizing the underlying array
  * when necessary to accommodate new elements.
  *
@@ -9,7 +9,7 @@ package jgl.collections.array;
  * @version 1.0
  * @since May 1st, 2024
  */
-public class ResizingByteArray {
+public class ByteArray {
 
     /**
      * The underlying array to store byte elements.
@@ -17,11 +17,11 @@ public class ResizingByteArray {
     private byte[] array;
 
     /**
-     * Constructs a ResizingByteArray with the specified initial size.
+     * Constructs a ByteArray with the specified initial size.
      *
      * @param size the initial size of the array.
      */
-    public ResizingByteArray(int size) {
+    public ByteArray(int size) {
         this.array = new byte[size];
     }
 

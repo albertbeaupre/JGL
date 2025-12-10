@@ -10,7 +10,6 @@ import java.util.NoSuchElementException;
  *
  * @param <T> the type of elements stored in the stack
  * @author Albert Beaupre
- * @version 1.0
  * @since May 1st, 2024
  */
 public class FastStack<T> implements Iterable<T> {
@@ -42,9 +41,7 @@ public class FastStack<T> implements Iterable<T> {
     public void push(T data) {
         if (ordinal == stack.length) { // Resize the stack array if it reaches its capacity
             T[] copy = (T[]) new Object[stack.length * 2];
-            for (int i = 0; i < stack.length; i++) {
-                copy[i] = stack[i];
-            }
+            System.arraycopy(stack, 0, copy, 0, stack.length);
             stack = copy;
         }
         stack[ordinal++] = data;

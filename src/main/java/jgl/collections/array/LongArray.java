@@ -1,7 +1,7 @@
 package jgl.collections.array;
 
 /**
- * ResizingLongArray is a class that represents a dynamic array with automatic resizing capabilities for primitive longs.
+ * LongArray is a class that represents a dynamic array with automatic resizing capabilities for primitive longs.
  * It allows the storage and retrieval of elements at specified indices, automatically resizing the underlying array
  * when necessary to accommodate new elements.
  *
@@ -9,7 +9,7 @@ package jgl.collections.array;
  * @version 1.0
  * @since May 1st, 2024
  */
-public class ResizingLongArray {
+public class LongArray {
 
     /**
      * The underlying array to store long elements.
@@ -17,11 +17,11 @@ public class ResizingLongArray {
     private long[] array;
 
     /**
-     * Constructs a ResizingLongArray with the specified initial size.
+     * Constructs a LongArray with the specified initial size.
      *
      * @param size the initial size of the array.
      */
-    public ResizingLongArray(int size) {
+    public LongArray(int size) {
         this.array = new long[size];
     }
 

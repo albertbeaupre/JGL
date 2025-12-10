@@ -7,12 +7,8 @@ import java.util.NoSuchElementException;
 /**
  * A generic implementation of a dynamic stack in Java. This is considered fast because it uses fewer
  * method calls and checks, which in turn is fewer instructions.
- * <p>
- * Now implements Iterable so that you can iterate over the stack's characters from top-of-stack (most recent)
- * to bottom in a for-each loop.
- * </p>
+ *
  * @author Albert Beaupre
- * @version 1.0
  * @since May 1st, 2024
  */
 public class CharFastStack implements Iterable<Character> {

@@ -1,7 +1,7 @@
 package jgl.collections.array;
 
 /**
- * ResizingIntArray is a class that represents a dynamic array with automatic resizing capabilities for primitive ints.
+ * IntArray is a class that represents a dynamic array with automatic resizing capabilities for primitive ints.
  * It allows the storage and retrieval of elements at specified indices, automatically resizing the underlying array
  * when necessary to accommodate new elements.
  *
@@ -9,7 +9,7 @@ package jgl.collections.array;
  * @version 1.0
  * @since May 1st, 2024
  */
-public class ResizingIntArray {
+public class IntArray {
 
     /**
      * The underlying array to store int elements.
@@ -17,11 +17,11 @@ public class ResizingIntArray {
     private int[] array;
 
     /**
-     * Constructs a ResizingIntArray with the specified initial size.
+     * Constructs a IntArray with the specified initial size.
      *
      * @param size the initial size of the array.
      */
-    public ResizingIntArray(int size) {
+    public IntArray(int size) {
         this.array = new int[size];
     }
 

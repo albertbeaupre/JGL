@@ -7,12 +7,9 @@ import java.util.NoSuchElementException;
 /**
  * A generic implementation of a dynamic stack in Java. This is considered fast because it uses fewer
  * method calls and checks, which in turn is fewer instructions.
- * <p>
- * This implementation now implements the Iterable interface, allowing you to iterate over the stack elements in LIFO order.
- * </p>
+ *
  * @author Albert Beaupre
- * @version 1.0
- * @since 1.0
+ * @since May 1st, 2024
  */
 public class ByteFastStack implements Iterable<Byte> {
     private byte[] stack;

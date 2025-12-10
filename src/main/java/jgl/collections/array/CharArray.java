@@ -1,7 +1,7 @@
 package jgl.collections.array;
 
 /**
- * ResizingCharArray is a class that represents a dynamic array with automatic resizing capabilities for primitive chars.
+ * CharArray is a class that represents a dynamic array with automatic resizing capabilities for primitive chars.
  * It allows the storage and retrieval of elements at specified indices, automatically resizing the underlying array
  * when necessary to accommodate new elements.
  *
@@ -9,7 +9,7 @@ package jgl.collections.array;
  * @version 1.0
  * @since May 1st, 2024
  */
-public class ResizingCharArray {
+public class CharArray {
 
     /**
      * The underlying array to store char elements.
@@ -17,11 +17,11 @@ public class ResizingCharArray {
     private char[] array;
 
     /**
-     * Constructs a ResizingCharArray with the specified initial size.
+     * Constructs a CharArray with the specified initial size.
      *
      * @param size the initial size of the array.
      */
-    public ResizingCharArray(int size) {
+    public CharArray(int size) {
         this.array = new char[size];
     }
 

@@ -1,7 +1,7 @@
 package jgl.collections.array;
 
 /**
- * ResizingFloatArray is a class that represents a dynamic array with automatic resizing capabilities for primitive floats.
+ * FloatArray is a class that represents a dynamic array with automatic resizing capabilities for primitive floats.
  * It allows the storage and retrieval of elements at specified indices, automatically resizing the underlying array
  * when necessary to accommodate new elements.
  *
@@ -9,7 +9,7 @@ package jgl.collections.array;
  * @version 1.0
  * @since May 1st, 2024
  */
-public class ResizingFloatArray {
+public class FloatArray {
 
     /**
      * The underlying array to store float elements.
@@ -17,11 +17,11 @@ public class ResizingFloatArray {
     private float[] array;
 
     /**
-     * Constructs a ResizingFloatArray with the specified initial size.
+     * Constructs a FloatArray with the specified initial size.
      *
      * @param size the initial size of the array.
      */
-    public ResizingFloatArray(int size) {
+    public FloatArray(int size) {
         this.array = new float[size];
     }
 

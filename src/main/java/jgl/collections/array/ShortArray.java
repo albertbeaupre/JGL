@@ -1,7 +1,7 @@
 package jgl.collections.array;
 
 /**
- * ResizingShortArray is a class that represents a dynamic array with automatic resizing capabilities for primitive shorts.
+ * ShortArray is a class that represents a dynamic array with automatic resizing capabilities for primitive shorts.
  * It allows the storage and retrieval of elements at specified indices, automatically resizing the underlying array
  * when necessary to accommodate new elements.
  *
@@ -9,7 +9,7 @@ package jgl.collections.array;
  * @version 1.0
  * @since May 1st, 2024
  */
-public class ResizingShortArray {
+public class ShortArray {
 
     /**
      * The underlying array to store short elements.
@@ -17,11 +17,11 @@ public class ResizingShortArray {
     private short[] array;
 
     /**
-     * Constructs a ResizingShortArray with the specified initial size.
+     * Constructs a ShortArray with the specified initial size.
      *
      * @param size the initial size of the array.
      */
-    public ResizingShortArray(int size) {
+    public ShortArray(int size) {
         this.array = new short[size];
     }
 

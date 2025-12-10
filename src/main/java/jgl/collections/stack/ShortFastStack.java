@@ -8,10 +8,7 @@ import java.util.NoSuchElementException;
  * A generic implementation of a dynamic stack in Java. This is considered fast because it uses fewer
  * method calls and checks, which in turn is fewer instructions.
  *
- * Now implements {@code Iterable<Short>}, so you can iterate over the elements in LIFO order.
- *
- * @author
- * @version 1.0
+ * @author Albert Beaupre
  * @since May 1st, 2024
  */
 public class ShortFastStack implements Iterable<Short> {
@@ -43,9 +40,7 @@ public class ShortFastStack implements Iterable<Short> {
         if (ordinal == stack.length) { // Resize the stack array if it reaches its capacity
             short[] copy = new short[stack.length * 2];
             // Copy the elements from the old array to the new array
-            for (int i = 0; i < stack.length; i++) {
-                copy[i] = stack[i];
-            }
+            System.arraycopy(stack, 0, copy, 0, stack.length);
             // Update the reference to the new array
             stack = copy;
         }

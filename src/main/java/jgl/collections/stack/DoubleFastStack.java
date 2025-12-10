@@ -7,11 +7,8 @@ import java.util.NoSuchElementException;
 /**
  * A generic implementation of a dynamic stack in Java. This is considered fast because it uses fewer
  * method calls and checks, which in turn is fewer instructions.
- * <p>
- * Now implements Iterable so you can iterate over the stack's doubles (in LIFO order) using enhanced for-loops.
- * </p>
+ *
  * @author Albert Beaupre
- * @version 1.0
  * @since May 1st, 2024
  */
 public class DoubleFastStack implements Iterable<Double> {

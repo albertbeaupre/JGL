@@ -7,11 +7,8 @@ import java.util.NoSuchElementException;
 /**
  * A generic implementation of a dynamic stack in Java. This is considered fast because it uses fewer
  * method calls and checks, which in turn is fewer instructions.
- * <p>
- * Now implements Iterable&lt;Integer&gt;, so you can iterate over the elements in LIFO order.
- * </p>
+ *
  * @author Albert Beaupre
- * @version 1.0
  * @since May 1st, 2024
  */
 public class IntFastStack implements Iterable<Integer> {
@@ -42,9 +39,7 @@ public class IntFastStack implements Iterable<Integer> {
     public void push(int data) {
         if (ordinal == stack.length) { // Resize the stack array if it reaches its capacity
             int[] copy = new int[stack.length * 2];
-            for (int i = 0; i < stack.length; i++) {
-                copy[i] = stack[i];
-            }
+            System.arraycopy(stack, 0, copy, 0, stack.length);
             stack = copy;
         }
         stack[ordinal++] = data;

@@ -7,11 +7,8 @@ import java.util.NoSuchElementException;
 /**
  * A generic implementation of a dynamic stack for floats in Java. This is considered fast because it uses fewer
  * method calls and checks, which in turn is fewer instructions.
- * <p>
- * Now implements {@code Iterable<Float>} so you can use enhanced for-loops to iterate over the stack elements in LIFO order.
- * </p>
+ *
  * @author Albert Beaupre
- * @version 1.0
  * @since May 1st, 2024
  */
 public class FloatFastStack implements Iterable<Float> {
@@ -42,9 +39,7 @@ public class FloatFastStack implements Iterable<Float> {
     public void push(float data) {
         if (ordinal == stack.length) { // Resize the stack array if it reaches its capacity
             float[] copy = new float[stack.length * 2];
-            for (int i = 0; i < stack.length; i++) {
-                copy[i] = stack[i];
-            }
+            System.arraycopy(stack, 0, copy, 0, stack.length);
             stack = copy;
         }
         stack[ordinal++] = data;

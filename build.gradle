@@ -12,6 +12,7 @@ java {
     }
 }
 
+def lwjglVersion = "3.3.4"
 def lwjglNatives = "natives-windows"
 
 repositories {
@@ -19,8 +20,6 @@ repositories {
 }
 
 dependencies {
-    def lwjglVersion = "3.3.4"
-
     implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
 
     implementation "org.lwjgl:lwjgl"
@@ -34,7 +33,6 @@ dependencies {
     runtimeOnly "org.lwjgl:lwjgl::$lwjglNatives"
     runtimeOnly "org.lwjgl:lwjgl-glfw::$lwjglNatives"
     runtimeOnly "org.lwjgl:lwjgl-opengl::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-nanovg::$lwjglNatives"
     runtimeOnly "org.lwjgl:lwjgl-stb::$lwjglNatives"
     runtimeOnly "org.lwjgl:lwjgl-openal::$lwjglNatives"
 }

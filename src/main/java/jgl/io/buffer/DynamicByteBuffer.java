@@ -1,4 +1,4 @@
-package jgl.io;
+package jgl.io.buffer;
 
 import java.nio.BufferUnderflowException;
 import java.nio.charset.StandardCharsets;

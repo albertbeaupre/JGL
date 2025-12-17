@@ -2,10 +2,6 @@ package jgl.graphics.shader;
 
 public class Shader {
 
-    private int attributeSize;
-
-    void apply() {
-
-    }
+    // TODO this is going to be a shader implementation
 
 }

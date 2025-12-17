@@ -1,9 +1,7 @@
 package jgl;
 
-import jgl.event.events.MouseMoveEvent;
-import jgl.event.events.MousePressEvent;
-import jgl.event.events.MouseReleaseEvent;
-import jgl.event.events.MouseScrollEvent;
+import jgl.event.events.*;
+import jgl.event.listeners.MouseListener;
 import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWMouseButtonCallback;
 import org.lwjgl.glfw.GLFWScrollCallback;
@@ -100,7 +98,12 @@ public final class Mouse {
             short fromY = y;
             x = (short) xpos;
             y = (short) ypos;
-            JGL.publish(new MouseMoveEvent(fromX, fromY, x, y));
+
+            if (buttonState > 0) {
+                JGL.publish(new MouseDragEvent(buttonState, modifierState, fromX, fromY, x, y));
+            } else {
+                JGL.publish(new MouseMoveEvent(buttonState, modifierState, fromX, fromY, x, y));
+            }
         });
 
         mouseButtonCallback = glfwSetMouseButtonCallback(Window.getAddress(), (win, button, action, mods) -> {
@@ -121,13 +124,27 @@ public final class Mouse {
             modifierState = (byte) mods;
         });
 
-
         scrollCallback = glfwSetScrollCallback(Window.getAddress(), (win, xoff, yoff) -> {
             scrollX = (byte) xoff;
             scrollY = (byte) yoff;
 
             JGL.publish(new MouseScrollEvent(scrollX, scrollY));
         });
+    }
+
+    /**
+     * Adds a {@code MouseListener} to the system to handle mouse-related events.
+     * The listener will be subscribed to receive notifications for various mouse events,
+     * including movement, button presses/releases, and dragging.
+     *
+     * @param listener the {@code MouseListener} to be added
+     *                 (must not be {@code null})
+     * @throws NullPointerException if the provided listener is {@code null}
+     */
+    public static void addMouseListener(MouseListener listener) {
+        if (listener == null)
+            throw new NullPointerException("A null MouseListener cannot be added");
+        JGL.subscribe(MouseEvent.class, listener);
     }
 
     /**

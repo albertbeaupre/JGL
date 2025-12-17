@@ -70,38 +70,6 @@ public class NinePatchTexture extends Texture {
         setSize(data.width(), data.height());
     }
 
-    public int getLeft() {
-        return left;
-    }
-
-    public int getRight() {
-        return right;
-    }
-
-    public int getTop() {
-        return top;
-    }
-
-    public int getBottom() {
-        return bottom;
-    }
-
-    public void setLeft(int left) {
-        this.left = left;
-    }
-
-    public void setRight(int right) {
-        this.right = right;
-    }
-
-    public void setTop(int top) {
-        this.top = top;
-    }
-
-    public void setBottom(int bottom) {
-        this.bottom = bottom;
-    }
-
     /**
      * Draws the nine-patch using 9 quads from the same underlying texture.
      *
@@ -192,4 +160,76 @@ public class NinePatchTexture extends Texture {
         setColor(originalColor);
     }
 
+
+    /**
+     * Retrieves the size of the left border in pixels.
+     *
+     * @return the left border size in pixels
+     */
+    public int getLeft() {
+        return left;
+    }
+
+    /**
+     * Retrieves the size of the right border in pixels.
+     *
+     * @return the right border size in pixels
+     */
+    public int getRight() {
+        return right;
+    }
+
+    /**
+     * Retrieves the size of the top border in pixels.
+     *
+     * @return the top border size in pixels
+     */
+    public int getTop() {
+        return top;
+    }
+
+    /**
+     * Retrieves the size of the bottom border in pixels.
+     *
+     * @return the bottom border size in pixels
+     */
+    public int getBottom() {
+        return bottom;
+    }
+
+    /**
+     * Sets the size of the left border in pixels.
+     *
+     * @param left the left border size in pixels to be set
+     */
+    public void setLeft(int left) {
+        this.left = left;
+    }
+
+    /**
+     * Sets the size of the right border in pixels.
+     *
+     * @param right the right border size in pixels to be set
+     */
+    public void setRight(int right) {
+        this.right = right;
+    }
+
+    /**
+     * Sets the size of the top border in pixels.
+     *
+     * @param top the top border size in pixels to be set
+     */
+    public void setTop(int top) {
+        this.top = top;
+    }
+
+    /**
+     * Sets the size of the bottom border in pixels.
+     *
+     * @param bottom the bottom border size in pixels to be set
+     */
+    public void setBottom(int bottom) {
+        this.bottom = bottom;
+    }
 }

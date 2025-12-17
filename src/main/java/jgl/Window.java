@@ -124,7 +124,7 @@ public final class Window {
      */
     public static void addWindowResizeListener(WindowResizeListener listener) {
         if (listener == null)
-            throw new NullPointerException("A null WindowResizeListener cannot be added to the Window");
+            throw new NullPointerException("A null WindowResizeListener cannot be added");
         JGL.subscribe(WindowResizeEvent.class, listener);
     }
 

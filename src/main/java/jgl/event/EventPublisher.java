@@ -84,30 +84,42 @@ public class EventPublisher {
     }
 
     /**
-     * Publishes an {@code Event} to all registered listeners for its type. Listeners are
-     * invoked in priority order, stopping if the event is consumed.
+     * Publishes the given {@code Event} to all registered {@code EventListener}s capable of handling it.
+     * The event is processed by listeners in order of their priority, from highest to lowest.
+     * If an event is consumed during processing, any remaining listeners will not be invoked.
      *
-     * @param event the event to publish
-     * @throws IllegalArgumentException if event is null
+     * @param event the event to be published; must not be null
+     * @throws NullPointerException if the event is null
+     * @throws RuntimeException     if an exception occurs while a listener is handling the event
      */
     public void publish(Event event) {
         Objects.requireNonNull(event, "A null event cannot be published.");
 
-        TreeSet<EventListener> set = listeners.get(event.getClass());
-        if (set != null) {
-            for (EventListener listener : set) {
-                if (event.isConsumed()) // Assuming Event uses isConsumed()
-                    break;
+        Class<?> clazz = event.getClass();
 
-                try {
-                    if (listener.canHandle(event))
-                        listener.handle(event);
-                } catch (Exception e) {
-                    throw new RuntimeException("Failed to handle event", e);
+        while (clazz != null && Event.class.isAssignableFrom(clazz)) {
+            @SuppressWarnings("unchecked")
+            TreeSet<EventListener> set = listeners.get((Class<? extends Event>) clazz);
+
+            if (set != null) {
+                for (EventListener listener : set) {
+                    if (event.isConsumed())
+                        return;
+
+                    try {
+                        if (listener.canHandle(event)) {
+                            listener.handle(event);
+                        }
+                    } catch (Exception e) {
+                        throw new RuntimeException("Failed to handle event", e);
+                    }
                 }
             }
+
+            clazz = clazz.getSuperclass();
         }
     }
+
 
     /**
      * Creates a {@code TreeSet} for storing listeners, ordered by priority (highest first).

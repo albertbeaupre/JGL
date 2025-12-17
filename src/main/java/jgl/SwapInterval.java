@@ -1,4 +1,4 @@
-package jgl.enums;
+package jgl;
 
 /**
  * Represents available swap interval (VSync) settings.

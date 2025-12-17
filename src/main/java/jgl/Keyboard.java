@@ -1,10 +1,18 @@
 package jgl;
 
+import jgl.event.events.KeyEvent;
 import jgl.event.events.KeyPressEvent;
 import jgl.event.events.KeyReleaseEvent;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_LAST;
+import static org.lwjgl.glfw.GLFW.GLFW_MOD_ALT;
+import static org.lwjgl.glfw.GLFW.GLFW_MOD_CONTROL;
+import static org.lwjgl.glfw.GLFW.GLFW_MOD_SHIFT;
+import static org.lwjgl.glfw.GLFW.GLFW_MOD_SUPER;
+import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
+import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
+import static org.lwjgl.glfw.GLFW.GLFW_REPEAT;
+import static org.lwjgl.glfw.GLFW.glfwSetKeyCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
-
-import static org.lwjgl.glfw.GLFW.*;
 
 /**
  * The {@code Keyboard} class provides static utilities for managing keyboard input
@@ -26,6 +34,9 @@ import static org.lwjgl.glfw.GLFW.*;
  * @since February 16th, 2025
  */
 public final class Keyboard {
+
+    private static final KeyPressEvent pressEvent = new KeyPressEvent(0, 0);
+    private static final KeyReleaseEvent releaseEvent = new KeyReleaseEvent(0, 0);
 
     /**
      * The GLFW key callback responsible for handling key press, release, and repeat
@@ -77,12 +88,20 @@ public final class Keyboard {
             currentKey = (short) key;
             modifierState = (byte) mods;
 
+            KeyEvent event = null;
+
             switch (action) {
-                case GLFW_PRESS, GLFW_REPEAT -> JGL.publish(new KeyPressEvent(key, mods));
+                case GLFW_PRESS, GLFW_REPEAT -> event = pressEvent;
                 case GLFW_RELEASE -> {
-                    JGL.publish(new KeyReleaseEvent(key, mods));
+                    event = releaseEvent;
                     currentKey = -1;
                 }
+            }
+
+            if (event != null) {
+                event.setKey(key);
+                event.setModifiers(modifierState);
+                JGL.publish(event);
             }
         });
     }

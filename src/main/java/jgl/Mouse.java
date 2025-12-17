@@ -34,6 +34,15 @@ import static org.lwjgl.glfw.GLFW.*;
 public final class Mouse {
 
     /**
+     * Pre-allocated mouse event instances for reuse.
+     */
+    private static final MousePressEvent pressEvent = new MousePressEvent(0, 0, 0, 0);
+    private static final MouseReleaseEvent releaseEvent = new MouseReleaseEvent(0, 0, 0, 0);
+    private static final MouseMoveEvent moveEvent = new MouseMoveEvent(0, 0, 0, 0, 0, 0);
+    private static final MouseDragEvent dragEvent = new MouseDragEvent(0, 0, 0, 0, 0, 0);
+    private static final MouseScrollEvent scrollEvent = new MouseScrollEvent(0, 0);
+
+    /**
      * GLFW callback for handling mouse movement. This callback updates cursor
      * coordinates and publishes a {@link MouseMoveEvent} whenever the user moves
      * the mouse cursor.
@@ -99,26 +108,40 @@ public final class Mouse {
             x = (short) xpos;
             y = (short) ypos;
 
-            if (buttonState > 0) {
-                JGL.publish(new MouseDragEvent(buttonState, modifierState, fromX, fromY, x, y));
-            } else {
-                JGL.publish(new MouseMoveEvent(buttonState, modifierState, fromX, fromY, x, y));
-            }
+            MouseMoveEvent event = moveEvent;
+
+            if (buttonState > 0)
+                event = dragEvent;
+
+            event.setX(fromX);
+            event.setY(fromY);
+            event.setToX(x);
+            event.setToY(y);
+            event.setButton(buttonState);
+            event.setModifiers(modifierState);
+
+            JGL.publish(event);
         });
 
         mouseButtonCallback = glfwSetMouseButtonCallback(Window.getAddress(), (win, button, action, mods) -> {
             if (button < 0 || button > GLFW_MOUSE_BUTTON_LAST) return;
 
+            MouseEvent event = null;
+
             if (action == GLFW_PRESS) {
-                // Fire press event
-                JGL.publish(new MousePressEvent(x, y, button, mods));
-                // Set flag
+                event = pressEvent;
                 buttonState |= (byte) (1 << button);
             } else if (action == GLFW_RELEASE) {
-                // Fire release event
-                JGL.publish(new MouseReleaseEvent(x, y, button, mods));
-                // Clear flag
+                event = releaseEvent;
                 buttonState &= (byte) ~(1 << button);
+            }
+
+            if (event != null) {
+                event.setX(x);
+                event.setY(y);
+                event.setButton(button);
+                event.setModifiers(modifierState);
+                JGL.publish(event);
             }
 
             modifierState = (byte) mods;
@@ -128,7 +151,10 @@ public final class Mouse {
             scrollX = (byte) xoff;
             scrollY = (byte) yoff;
 
-            JGL.publish(new MouseScrollEvent(scrollX, scrollY));
+            scrollEvent.setXOffset(scrollX);
+            scrollEvent.setYOffset(scrollY);
+
+            JGL.publish(scrollEvent);
         });
     }
 

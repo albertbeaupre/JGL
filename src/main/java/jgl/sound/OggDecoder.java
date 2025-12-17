@@ -9,16 +9,15 @@ import java.nio.ShortBuffer;
 
 public class OggDecoder implements SoundDecoder {
 
+    private static final IntBuffer channelsBuf = BufferUtils.createIntBuffer(1);
+    private static final IntBuffer sampleRateBuf = BufferUtils.createIntBuffer(1);
+
     @Override
     public SoundData load(byte[] data) throws Exception {
 
         // Wrap input bytes
         ByteBuffer buffer = BufferUtils.createByteBuffer(data.length);
         buffer.put(data).flip();
-
-        // Outputs for stb_vorbis_decode_memory
-        IntBuffer channelsBuf = BufferUtils.createIntBuffer(1);
-        IntBuffer sampleRateBuf = BufferUtils.createIntBuffer(1);
 
         // Decode entire file into PCM 16-bit short buffer
         ShortBuffer pcm = STBVorbis.stb_vorbis_decode_memory(buffer, channelsBuf, sampleRateBuf);

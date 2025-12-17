@@ -37,6 +37,10 @@ import java.nio.file.Path;
  */
 public record TextureData(ByteBuffer buffer, short width, short height) {
 
+    private static final IntBuffer w = BufferUtils.createIntBuffer(1);
+    private static final IntBuffer h = BufferUtils.createIntBuffer(1);
+    private static final IntBuffer comp = BufferUtils.createIntBuffer(1);
+
     /**
      * Loads a texture from a file path. This is a convenience wrapper around
      * {@link #load(byte[])} which retrieves the raw file bytes first.
@@ -73,13 +77,10 @@ public record TextureData(ByteBuffer buffer, short width, short height) {
         ByteBuffer dataBuffer = BufferUtils.createByteBuffer(data.length);
         dataBuffer.put(data).flip();
 
-        IntBuffer w = BufferUtils.createIntBuffer(1);
-        IntBuffer h = BufferUtils.createIntBuffer(1);
-        IntBuffer comp = BufferUtils.createIntBuffer(1);
-
         STBImage.stbi_set_flip_vertically_on_load(true);
 
         ByteBuffer image = STBImage.stbi_load_from_memory(dataBuffer, w, h, comp, 4);
+
         if (image == null)
             throw new RuntimeException("Failed to load image: " + STBImage.stbi_failure_reason());
 

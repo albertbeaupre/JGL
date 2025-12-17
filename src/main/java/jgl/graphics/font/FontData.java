@@ -31,15 +31,18 @@ import static org.lwjgl.stb.STBTruetype.*;
 public record FontData(ByteBuffer bitmap, STBTTPackedchar[] charData, byte[] atlasPixels, int atlasSize, int firstChar,
                        int numChars, float ascent, float descent, float scale, float baseline) {
 
+    private static final IntBuffer ascBuf = BufferUtils.createIntBuffer(1);
+    private static final IntBuffer descBuf = BufferUtils.createIntBuffer(1);
+    private static final int atlas_size = 1024;
+    private static final ByteBuffer bitmap_const = BufferUtils.createByteBuffer(atlas_size * atlas_size);
+    private static final byte[] atlas_pixels = new byte[atlas_size * atlas_size];
+
     public static FontData load(byte[] fileData, int fontSize, int firstChar, int numChars) {
         // Load TTF file into STB
         STBTTFontinfo info = STBTTFontinfo.create();
         ByteBuffer fontBuffer = BufferUtils.createByteBuffer(fileData.length).put(fileData).flip();
         if (!stbtt_InitFont(info, fontBuffer)) throw new RuntimeException("Failed to init STB font");
 
-        // Get font metrics
-        IntBuffer ascBuf = BufferUtils.createIntBuffer(1);
-        IntBuffer descBuf = BufferUtils.createIntBuffer(1);
         stbtt_GetFontVMetrics(info, ascBuf, descBuf, null);
 
         float ascent = ascBuf.get(0);
@@ -47,16 +50,14 @@ public record FontData(ByteBuffer bitmap, STBTTPackedchar[] charData, byte[] atl
         float scale = stbtt_ScaleForPixelHeight(info, fontSize);
         float baseline = ascent * scale;
 
-        // Create the bitmap atlas buffer
-        int atlasSize = 1024;
-        ByteBuffer bitmap = BufferUtils.createByteBuffer(atlasSize * atlasSize);
+        ByteBuffer bitmap = bitmap_const;
 
         // Allocate native character storage
         STBTTPackedchar.Buffer nativeChars = STBTTPackedchar.malloc(numChars);
 
         // STB font packing
         try (STBTTPackContext pc = STBTTPackContext.malloc()) {
-            stbtt_PackBegin(pc, bitmap, atlasSize, atlasSize, 0, 1, 0);
+            stbtt_PackBegin(pc, bitmap, atlas_size, atlas_size, 0, 1, 0);
             stbtt_PackSetOversampling(pc, 1, 1);
             stbtt_PackFontRange(pc, fontBuffer, 0, fontSize, firstChar, nativeChars);
             stbtt_PackEnd(pc);
@@ -70,10 +71,10 @@ public record FontData(ByteBuffer bitmap, STBTTPackedchar[] charData, byte[] atl
         nativeChars.free();
 
         bitmap.rewind();
-        byte[] atlasPixels = new byte[atlasSize * atlasSize];
+        byte[] atlasPixels = atlas_pixels;
         bitmap.get(atlasPixels);
         bitmap.rewind();
-        return new FontData(bitmap, charData, atlasPixels, atlasSize, firstChar, numChars, ascent, descent, scale, baseline);
+        return new FontData(bitmap, charData, atlasPixels, atlas_size, firstChar, numChars, ascent, descent, scale, baseline);
     }
 
     public static FontData load(String path, int fontSize, int firstChar, int numChars) {

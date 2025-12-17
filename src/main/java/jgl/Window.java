@@ -1,6 +1,5 @@
 package jgl;
 
-import jgl.enums.SwapInterval;
 import jgl.event.events.WindowResizeEvent;
 import jgl.event.listeners.WindowResizeListener;
 import org.lwjgl.glfw.*;
@@ -23,6 +22,8 @@ import static org.lwjgl.system.MemoryUtil.NULL;
  * @since October 17th, 2025
  */
 public final class Window {
+
+    private static final WindowResizeEvent resizeEvent = new WindowResizeEvent(0, 0, 0, 0);
 
     // GLFW callback handlers
     private static GLFWFramebufferSizeCallback fbCallback;
@@ -75,7 +76,11 @@ public final class Window {
             Window.width = (short) newW;
             Window.height = (short) newH;
 
-            JGL.publish(new WindowResizeEvent(oldWidth, oldHeight, Window.width, Window.height));
+            resizeEvent.setOldHeight(oldHeight);
+            resizeEvent.setOldWidth(oldWidth);
+            resizeEvent.setNewHeight(Window.height);
+            resizeEvent.setNewWidth(Window.width);
+            JGL.publish(resizeEvent);
         });
         posCallback = glfwSetWindowPosCallback(address, (win, newX, newY) -> {
             Window.x = (short) newX;

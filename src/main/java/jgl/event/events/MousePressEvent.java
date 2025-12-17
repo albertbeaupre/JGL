@@ -1,7 +1,7 @@
 package jgl.event.events;
 
-public class MousePressEvent extends MouseEvent{
-    public MousePressEvent(int x, int y, int button, int modifiers) {
-        super(x, y, button, modifiers);
+public class MousePressEvent extends MouseEvent {
+    public MousePressEvent(int button, int modifiers, int x, int y) {
+        super(button, modifiers, x, y);
     }
 }

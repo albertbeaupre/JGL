@@ -10,13 +10,22 @@ import static org.lwjgl.glfw.GLFW.GLFW_MOD_SUPER;
 
 public class KeyEvent extends Event {
 
-    private final short key;
-    private final byte modifiers;
+    private short key;
+    private byte modifiers;
 
     public KeyEvent(int key, int modifiers) {
         this.key = (short) key;
         this.modifiers = (byte) modifiers;
     }
+
+    public void setKey(int key) {
+        this.key = (short) key;
+    }
+
+    public void setModifiers(int modifiers) {
+        this.modifiers = (byte) modifiers;
+    }
+
 
     public short getKey() {
         return key;

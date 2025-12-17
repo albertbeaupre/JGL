@@ -9,14 +9,30 @@ import static org.lwjgl.glfw.GLFW.GLFW_MOD_SUPER;
 
 public class MouseEvent extends Event {
 
-    private final short x, y;
-    private final byte button;
-    private final byte modifiers;
+    private short x, y;
+    private byte button;
+    private byte modifiers;
 
-    public MouseEvent(int x, int y, int button, int modifiers) {
+    public MouseEvent(int button, int modifiers, int x, int y) {
         this.x = (short) x;
         this.y = (short) y;
         this.button = (byte) button;
+        this.modifiers = (byte) modifiers;
+    }
+
+    public void setButton(int button) {
+        this.button = (byte) button;
+    }
+
+    public void setX(short x) {
+        this.x = x;
+    }
+
+    public void setY(short y) {
+        this.y = y;
+    }
+
+    public void setModifiers(int modifiers) {
         this.modifiers = (byte) modifiers;
     }
 

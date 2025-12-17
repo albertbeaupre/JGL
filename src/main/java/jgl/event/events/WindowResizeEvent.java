@@ -4,13 +4,29 @@ import jgl.event.Event;
 
 public class WindowResizeEvent extends Event {
 
-    private final short oldWidth, oldHeight;
-    private final short newWidth, newHeight;
+    private short oldWidth, oldHeight;
+    private short newWidth, newHeight;
 
-    public WindowResizeEvent(short oldWidth, short oldHeight, short newWidth, short newHeight) {
+    public WindowResizeEvent(int oldWidth, int oldHeight, int newWidth, int newHeight) {
+        this.oldWidth = (short) oldWidth;
+        this.oldHeight = (short) oldHeight;
+        this.newWidth = (short) newWidth;
+        this.newHeight = (short) newHeight;
+    }
+
+    public void setOldWidth(short oldWidth) {
         this.oldWidth = oldWidth;
+    }
+
+    public void setOldHeight(short oldHeight) {
         this.oldHeight = oldHeight;
+    }
+
+    public void setNewWidth(short newWidth) {
         this.newWidth = newWidth;
+    }
+
+    public void setNewHeight(short newHeight) {
         this.newHeight = newHeight;
     }
 

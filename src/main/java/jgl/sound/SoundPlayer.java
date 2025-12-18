@@ -31,17 +31,13 @@ public class SoundPlayer {
      */
     public SoundPlayer(SoundData data) {
         this.data = data;
-        int buffer = alGenBuffers();
+        this.buffer = alGenBuffers();
         int format = (data.channels() == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
 
         alBufferData(buffer, format, data.data(), data.sampleRate());
 
-        int source = alGenSources();
+        this.source = alGenSources();
         alSourcei(source, AL_BUFFER, buffer);
-
-        this.buffer = buffer;
-        this.source = source;
-
         setVolume(1f);
         setPitch(1f);
         setLooping(false);

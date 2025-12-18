@@ -3,6 +3,7 @@ package jgl;
 import jgl.event.events.KeyEvent;
 import jgl.event.events.KeyPressEvent;
 import jgl.event.events.KeyReleaseEvent;
+import jgl.event.listeners.KeyListener;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_LAST;
 import static org.lwjgl.glfw.GLFW.GLFW_MOD_ALT;
 import static org.lwjgl.glfw.GLFW.GLFW_MOD_CONTROL;
@@ -104,6 +105,23 @@ public final class Keyboard {
                 JGL.publish(event);
             }
         });
+    }
+
+    /**
+     * Registers a {@code KeyListener} to receive keyboard event notifications.
+     * The listener will be invoked for specific key events, such as key presses
+     * and key releases.
+     * <p>
+     * This method ensures that a non-null {@code KeyListener} is provided. If
+     * a {@code null} listener is passed, a {@code NullPointerException} is thrown.
+     *
+     * @param listener the {@code KeyListener} to add; must not be {@code null}
+     * @throws NullPointerException if the provided {@code listener} is {@code null}
+     */
+    public static void addKeyListener(KeyListener listener) {
+        if (listener == null)
+            throw new NullPointerException("A null KeyListener cannot be added");
+        JGL.subscribe(KeyEvent.class, listener);
     }
 
     /**

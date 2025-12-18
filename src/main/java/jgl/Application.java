@@ -26,7 +26,7 @@ public interface Application {
      *
      * @param delta The time elapsed since the last update in seconds
      */
-    void update(float delta);
+    void update(double delta);
 
     /**
      * Cleans up and releases resources used by the application. This method is

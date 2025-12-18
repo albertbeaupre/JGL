@@ -19,7 +19,7 @@ import static org.lwjgl.opengl.GL11.glClear;
 public class JGL {
 
     private static final EventPublisher events = new EventPublisher();
-    private static float deltaTime;
+    private static double deltaTime;
     private static short framesPerSecond;
 
     /**
@@ -43,15 +43,15 @@ public class JGL {
         Mouse.init();
         Keyboard.init();
 
-        float lastTime = (float) glfwGetTime();
-        float fpsTime = 0;
+        double lastTime = (float) glfwGetTime();
+        double fpsTime = 0;
         short frames = 0;
 
         application.init();
         while (!Window.shouldClose()) {
             glClear(GL_COLOR_BUFFER_BIT);
 
-            float now = (float) glfwGetTime();
+            double now = glfwGetTime();
             deltaTime = now - lastTime;
             lastTime = now;
 
@@ -127,7 +127,7 @@ public class JGL {
      *
      * @return The time difference (delta time) in seconds as a double.
      */
-    public static float getDeltaTime() {
+    public static double getDeltaTime() {
         return deltaTime;
     }
 

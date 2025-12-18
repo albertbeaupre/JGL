@@ -2,6 +2,7 @@ package jgl;
 
 import jgl.event.events.*;
 import jgl.event.listeners.MouseListener;
+import jgl.event.listeners.MouseScrollListener;
 import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWMouseButtonCallback;
 import org.lwjgl.glfw.GLFWScrollCallback;
@@ -171,6 +172,20 @@ public final class Mouse {
         if (listener == null)
             throw new NullPointerException("A null MouseListener cannot be added");
         JGL.subscribe(MouseEvent.class, listener);
+    }
+
+    /**
+     * Adds a {@code MouseScrollListener} to the system to handle mouse scroll events.
+     * The listener will be subscribed to receive notifications for scroll actions
+     * detected by the mouse.
+     *
+     * @param listener the {@code MouseScrollListener} to be added (must not be {@code null})
+     * @throws NullPointerException if the provided listener is {@code null}
+     */
+    public static void addScrollListener(MouseScrollListener listener) {
+        if (listener == null)
+            throw new NullPointerException("A null MouseScrollListener cannot be added");
+        JGL.subscribe(MouseScrollEvent.class, listener);
     }
 
     /**

@@ -50,7 +50,7 @@ public class AssetTest implements Application {
     }
 
     @Override
-    public void update(float delta) {
+    public void update(double delta) {
         int progress = (int) (Assets.getProgress() * 100f);
         font.setText("Loading - " + progress + "%");
         font.setPosition((Window.getWidth() - font.getWidth()) / 2f, (Window.getHeight() - font.getHeight()) / 2f);

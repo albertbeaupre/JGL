@@ -151,7 +151,7 @@ public class SoundTest implements Application {
     }
 
     @Override
-    public void update(float delta) {
+    public void update(double delta) {
         // event-driven, nothing needed here
     }
 

@@ -48,7 +48,7 @@ public class NinePatchTextureTest implements Application {
     }
 
     @Override
-    public void update(float delta) {
+    public void update(double delta) {
         viewport.update(Window.getWidth(), Window.getHeight());
         time += delta;
         Window.setTitle("FPS: " + JGL.getFramesPerSecond());

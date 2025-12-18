@@ -71,7 +71,7 @@ public class TexturePackerTest implements Application {
     }
 
     @Override
-    public void update(float delta) {
+    public void update(double delta) {
         viewport.update(Window.getWidth(), Window.getHeight());
         font.setText("FPS: " + JGL.getFramesPerSecond() + " X: " + Mouse.getX() + " Y: " + Mouse.getY());
 

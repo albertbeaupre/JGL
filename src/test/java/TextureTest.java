@@ -56,7 +56,7 @@ public class TextureTest implements Application {
     }
 
     @Override
-    public void update(float delta) {
+    public void update(double delta) {
         viewport.update(Window.getWidth(), Window.getHeight());
         Window.setTitle("FPS: " + JGL.getFramesPerSecond());
         time += delta;
@@ -67,7 +67,7 @@ public class TextureTest implements Application {
         // Toggle flipping every 2 seconds to test flip logic
         flipping.setFlipX((int) (time * 0.5f) % 2 == 0);
         flipping.setFlipY((int) (time * 0.25f) % 2 == 0);
-        rotating.setRotation(rotating.getRotation() + delta * 100f);
+        rotating.setRotation((float) (rotating.getRotation() + delta * 100f));
     }
 
     @Override

@@ -1,9 +1,5 @@
 package jgl.graphics.texture;
 
-import jgl.graphics.Color;
-
-import java.util.function.BiConsumer;
-
 /**
  * Simple nine-patch renderer built on top of {@link Texture}.
  *
@@ -35,6 +31,15 @@ public class NinePatchTexture extends Texture {
     private int right;
     private int top;
     private int bottom;
+
+    // Reusable temp arrays (NO per-frame allocation)
+    private final float[] tmpIn = new float[2];
+    private final float[] tmpOut = new float[2];
+
+    // Slice data reused every frame
+    private final float[][] slicePos = new float[9][2];
+    private final float[][] sliceSize = new float[9][2];
+    private final int[][] srcRegions = new int[9][4];
 
     /**
      * Creates a NinePatchTexture from an image path and border sizes.
@@ -86,7 +91,6 @@ public class NinePatchTexture extends Texture {
      */
     @Override
     public void draw() {
-
         TextureData data = getData();
         int srcW = data.width();
         int srcH = data.height();
@@ -96,12 +100,10 @@ public class NinePatchTexture extends Texture {
         float totalW = getWidth();
         float totalH = getHeight();
 
-        // Rotation pivot (same as Texture)
         float originX = getOrigin().getX();
         float originY = getOrigin().getY();
 
-        float rot = getRotation();
-        float rad = (float) Math.toRadians(-rot);
+        float rad = (float) Math.toRadians(-getRotation());
         float sin = (float) Math.sin(rad);
         float cos = (float) Math.cos(rad);
 
@@ -110,56 +112,82 @@ public class NinePatchTexture extends Texture {
 
         float x1 = baseX + left;
         float x2 = baseX + left + stretchW;
-
         float y1 = baseY + top;
         float y2 = baseY + top + stretchH;
 
-        Color originalColor = getColor();
+        slicePos[0][0] = baseX; slicePos[0][1] = baseY;
+        slicePos[1][0] = x1;    slicePos[1][1] = baseY;
+        slicePos[2][0] = x2;    slicePos[2][1] = baseY;
 
-        // Rotation helper
-        BiConsumer<float[], float[]> rotatePoint = (in, out) -> {
-            float lx = in[0] - originX;
-            float ly = in[1] - originY;
+        slicePos[3][0] = baseX; slicePos[3][1] = y1;
+        slicePos[4][0] = x1;    slicePos[4][1] = y1;
+        slicePos[5][0] = x2;    slicePos[5][1] = y1;
 
-            float rx = lx * cos - ly * sin;
-            float ry = lx * sin + ly * cos;
+        slicePos[6][0] = baseX; slicePos[6][1] = y2;
+        slicePos[7][0] = x1;    slicePos[7][1] = y2;
+        slicePos[8][0] = x2;    slicePos[8][1] = y2;
 
-            out[0] = rx + originX;
-            out[1] = ry + originY;
-        };
+        sliceSize[0][0] = left;      sliceSize[0][1] = top;
+        sliceSize[1][0] = stretchW;  sliceSize[1][1] = top;
+        sliceSize[2][0] = right;     sliceSize[2][1] = top;
 
-        float[] p = new float[2];
-        float[] r = new float[2];
+        sliceSize[3][0] = left;      sliceSize[3][1] = stretchH;
+        sliceSize[4][0] = stretchW;  sliceSize[4][1] = stretchH;
+        sliceSize[5][0] = right;     sliceSize[5][1] = stretchH;
 
-        // Slice drawer using rotated top-left corners
-        BiConsumer<float[], float[]> drawSlice = (pos, size) -> {
-            p[0] = pos[0];
-            p[1] = pos[1];
-            rotatePoint.accept(p, r);
+        sliceSize[6][0] = left;      sliceSize[6][1] = bottom;
+        sliceSize[7][0] = stretchW;  sliceSize[7][1] = bottom;
+        sliceSize[8][0] = right;     sliceSize[8][1] = bottom;
 
-            super.setPosition(r[0], r[1]);
-            super.setSize(size[0], size[1]);
-            super.draw();
-        };
+        int[] r;
 
-        // Store source regions in an array so rotation code doesn't clutter logic
-        float[][] slicePos = {{baseX, baseY}, {x1, baseY}, {x2, baseY}, {baseX, y1}, {x1, y1}, {x2, y1}, {baseX, y2}, {x1, y2}, {x2, y2}};
-        float[][] sliceSize = {{left, top}, {stretchW, top}, {right, top}, {left, stretchH}, {stretchW, stretchH}, {right, stretchH}, {left, bottom}, {stretchW, bottom}, {right, bottom}};
-        int[][] srcRegions = {{0, 0, left, top}, {left, 0, srcW - right, top}, {srcW - right, 0, srcW, top}, {0, top, left, srcH - bottom}, {left, top, srcW - right, srcH - bottom}, {srcW - right, top, srcW, srcH - bottom}, {0, srcH - bottom, left, srcH}, {left, srcH - bottom, srcW - right, srcH}, {srcW - right, srcH - bottom, srcW, srcH}};
+        r = srcRegions[0];
+        r[0] = 0; r[1] = 0; r[2] = left; r[3] = top;
+
+        r = srcRegions[1];
+        r[0] = left; r[1] = 0; r[2] = srcW - right; r[3] = top;
+
+        r = srcRegions[2];
+        r[0] = srcW - right; r[1] = 0; r[2] = srcW; r[3] = top;
+
+        r = srcRegions[3];
+        r[0] = 0; r[1] = top; r[2] = left; r[3] = srcH - bottom;
+
+        r = srcRegions[4];
+        r[0] = left; r[1] = top; r[2] = srcW - right; r[3] = srcH - bottom;
+
+        r = srcRegions[5];
+        r[0] = srcW - right; r[1] = top; r[2] = srcW; r[3] = srcH - bottom;
+
+        r = srcRegions[6];
+        r[0] = 0; r[1] = srcH - bottom; r[2] = left; r[3] = srcH;
+
+        r = srcRegions[7];
+        r[0] = left; r[1] = srcH - bottom; r[2] = srcW - right; r[3] = srcH;
+
+        r = srcRegions[8];
+        r[0] = srcW - right; r[1] = srcH - bottom; r[2] = srcW; r[3] = srcH;
 
         for (int i = 0; i < 9; i++) {
+
             int[] uv = srcRegions[i];
             setRegion(uv[0], uv[1], uv[2], uv[3]);
-            drawSlice.accept(slicePos[i], sliceSize[i]);
+
+            float lx = slicePos[i][0] - originX;
+            float ly = slicePos[i][1] - originY;
+
+            tmpOut[0] = lx * cos - ly * sin + originX;
+            tmpOut[1] = lx * sin + ly * cos + originY;
+
+            super.setPosition(tmpOut[0], tmpOut[1]);
+            super.setSize(sliceSize[i][0], sliceSize[i][1]);
+            super.draw();
         }
 
-        // Restore full UV and original transform
         setRegion(0, 0, srcW, srcH);
         super.setPosition(baseX, baseY);
         super.setSize(totalW, totalH);
-        setColor(originalColor);
     }
-
 
     /**
      * Retrieves the size of the left border in pixels.

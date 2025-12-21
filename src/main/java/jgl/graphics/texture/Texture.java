@@ -191,6 +191,7 @@ public class Texture {
 
         // Upload the pixel buffer to the GPU using 8-bit RGBA format.
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, data.width(), data.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, data.buffer());
+        data.dispose();
 
         this.data = data;
         this.width = data.width();
@@ -615,6 +616,7 @@ public class Texture {
      * when the texture is no longer needed to free GPU memory.
      */
     public void dispose() {
+        data.dispose();
         glDeleteTextures(textureID);
     }
 

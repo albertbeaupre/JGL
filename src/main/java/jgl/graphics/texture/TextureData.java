@@ -29,7 +29,7 @@ import java.nio.file.Path;
  * <p>This class always forces the loaded image into 4-channel RGBA format for consistency.
  * STBImage is configured to vertically flip textures to match OpenGL UV orientation.</p>
  *
- * @param buffer   the raw binary buffer containing the texture image buffer
+ * @param buffer the raw binary buffer containing the texture image buffer
  * @param width  the width of the decoded texture in pixels
  * @param height the height of the decoded texture in pixels
  * @author Albert Beaupre
@@ -89,4 +89,15 @@ public record TextureData(ByteBuffer buffer, short width, short height) {
 
         return new TextureData(image, (short) width, (short) height);
     }
+
+    /**
+     * Releases the native resources associated with the texture data.
+     * <p>
+     * This method frees the memory associated with the image buffer to prevent
+     * memory leaks. It should be called when the texture data is no longer needed.
+     */
+    public void dispose() {
+        STBImage.stbi_image_free(buffer());
+    }
+
 }

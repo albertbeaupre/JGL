@@ -15,6 +15,7 @@ public class SoundTest implements Application {
 
     @Override
     public void init() {
+        sound1 = Audio.load("src/test/resources/test-sound-4.mp3");
         sound2 = Audio.load("src/test/resources/test-sound-2.ogg");
         sound3 = Audio.load("src/test/resources/test-sound.wav");
         // default selection

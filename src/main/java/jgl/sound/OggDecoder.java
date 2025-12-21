@@ -2,6 +2,7 @@ package jgl.sound;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.stb.STBVorbis;
+import org.lwjgl.system.libc.LibCStdlib;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -14,12 +15,9 @@ public class OggDecoder implements SoundDecoder {
 
     @Override
     public SoundData load(byte[] data) throws Exception {
-
-        // Wrap input bytes
         ByteBuffer buffer = BufferUtils.createByteBuffer(data.length);
         buffer.put(data).flip();
 
-        // Decode entire file into PCM 16-bit short buffer
         ShortBuffer pcm = STBVorbis.stb_vorbis_decode_memory(buffer, channelsBuf, sampleRateBuf);
 
         if (pcm == null)
@@ -29,7 +27,7 @@ public class OggDecoder implements SoundDecoder {
         int sampleRate = sampleRateBuf.get(0);
         int bitsPerSample = 16;
 
-        // Convert ShortBuffer → ByteBuffer
+
         ByteBuffer pcmBytes = BufferUtils.createByteBuffer(pcm.remaining() * 2);
         short[] pcm16 = new short[pcm.remaining()];
 
@@ -41,6 +39,7 @@ public class OggDecoder implements SoundDecoder {
         pcmBytes.flip();
 
         float duration = pcm16.length / (float) (channels * sampleRate);
+        LibCStdlib.free(pcm);
 
         return new SoundData(pcmBytes, duration, channels, sampleRate, bitsPerSample, pcm16);
     }

@@ -33,7 +33,6 @@ public class NinePatchTexture extends Texture {
     private int bottom;
 
     // Reusable temp arrays (NO per-frame allocation)
-    private final float[] tmpIn = new float[2];
     private final float[] tmpOut = new float[2];
 
     // Slice data reused every frame
